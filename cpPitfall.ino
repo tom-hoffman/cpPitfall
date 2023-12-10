@@ -16,7 +16,7 @@
 //=============================================================================
 
 // initial value for the random number generator:
-const int RAND_SEED = 0xc4;            // defines the start scene of the game
+const byte RAND_SEED = 0xc4;        // defines the start scene of the game
 
 // color constants
 // Based on translating Atari 2600 colors to RGB, then adjusting as needed.
@@ -35,6 +35,16 @@ const int GREY          = 0x5B5B5B; // $06
 const int WHITE         = 0xFFFFFF; // $0e
 const int DARK_GREEN    = 0x103600; // GREEN - $04
 const int DARK_RED      = 0x6F001F; // RED - $06
+const int COLOR_LST[]   = {BROWN, YELLOW, ORANGE, RED, GREEN, BLUE, 
+                           YELLOW_GREEN, PINK, BLACK, GREY, WHITE, DARK_GREEN,
+                           DARK_RED}; // variable in the original
+
+//==============================================================================
+// Z P - V A R I A B L E S
+//==============================================================================
+
+byte lives = 3;
+byte room = RAND_SEED;              // in place of "random" in the original
 
 void setup() {
   CircuitPlayground.begin();
