@@ -2,8 +2,10 @@
 
 // cpPitfall -- Pitfall! for Circuit Playground.
 // Based on Pitfall! created by David Crane for Activision,
-// and on Johni Marangon's dissasembly and commentary at:
+// on Johni Marangon's dissasembly and commentary at:
 // https://github.com/johnidm/asm-atari-2600/blob/master/pitfall.asm
+// and evoniuk's analysis at
+// https://evoniuk.github.io/posts/pitfall.html
 
 //=============================================================================
 // C O M P I L E R - S W I T C H E S
@@ -46,10 +48,27 @@ const int COLOR_LST[]   = {BROWN, YELLOW, ORANGE, RED, GREEN, BLUE,
 byte lives = 3;
 byte room = RAND_SEED;              // in place of "random" in the original
 
+byte lfsrRight(byte room) {
+  byte new0 = bitRead(room, 3) ^ bitRead(room, 4) ^ bitRead(room, 5) ^ bitRead(room, 7);
+  return room << 1 | new0;
+}
+
+int rightRandom(byte room, boolean above) {
+  // Uses linear feedback shift register to generate next room 
+  byte x = 3;       // repeat 3 times if below ground
+  if (above) {      // just once if above ground
+    x = 1;
+  }
+  for (int i = 0; i <=x; i++) {
+    
+  }
+}
+
 void setup() {
   CircuitPlayground.begin();
   #ifdef DEBUG
     Serial.begin(9600);
+    delay(2000);
     CircuitPlayground.setPixelColor(0, BROWN);
     CircuitPlayground.setPixelColor(1, YELLOW);
     CircuitPlayground.setPixelColor(2, ORANGE);
@@ -60,6 +79,10 @@ void setup() {
     CircuitPlayground.setPixelColor(7, PINK);
     CircuitPlayground.setPixelColor(8, DARK_GREEN);
     CircuitPlayground.setPixelColor(9, DARK_RED);
+    Serial.println(lfsrRight(RAND_SEED));
+    Serial.println(lfsrRight(lfsrRight(RAND_SEED)));
+    Serial.println(lfsrRight(lfsrRight(lfsrRight(RAND_SEED))));
+    Serial.println(lfsrRight(lfsrRight(lfsrRight(lfsrRight(RAND_SEED)))));
   #endif
 }
 
