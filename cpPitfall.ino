@@ -24,36 +24,41 @@ const byte RAND_SEED    = 0xc4;        // defines the start scene of the game
 // Based on translating Atari 2600 colors to RGB, then adjusting as needed.
 // Sticking to original palette as much as possible.
 // https://www.randomterrain.com/atari-2600-memories-tia-color-charts.html
-// Minimum value of each RGB is 0x0D.
 
-const int BROWN         = 0x3A1F00; // $12
-const int YELLOW        = 0xFEFA40; // $1e
-const int ORANGE        = 0xFEC6BB; // $3e
-const int RED           = 0xE14585; // $48
-const int GREEN         = 0x537E00; // $d6
-const int BLUE          = 0x006957; // $a4
-const int YELLOW_GREEN  = 0x49B509; // $c8
-const int PINK          = 0xFE67AA; // $4a
-const int BLACK         = 0x000000; // $00
-const int GREY          = 0x5B5B5B; // $06
-const int WHITE         = 0xFFFFFF; // $0e
-const int DARK_GREEN    = 0x103600; // GREEN - $04
-const int DARK_RED      = 0x6F001F; // RED - $06
-const int COLOR_LST[]   = {BROWN, YELLOW, ORANGE, RED, GREEN, BLUE, 
-                           YELLOW_GREEN, PINK, BLACK, GREY, WHITE, DARK_GREEN,
-                           DARK_RED}; // variable in the original
+int gammaCorrect(int c) {
+  byte red   = CircuitPlayground.gamma8(c >> 16);
+  byte green = CircuitPlayground.gamma8((c & 0x00FF00)  >> 8);
+  byte blue  = CircuitPlayground.gamma8(c & 0x0000FF);
+  return ((red << 16L) | (green << 8L) | blue);
+}
+
+const int BROWN         = gammaCorrect(0x3A1F00); // $12
+const int YELLOW        = gammaCorrect(0xFEFA40); // $1e
+const int ORANGE        = gammaCorrect(0xFEC6BB); // $3e
+const int RED           = gammaCorrect(0xE14585); // $48
+const int GREEN         = gammaCorrect(0x537E00); // $d6
+const int BLUE          = gammaCorrect(0x006957); // $a4
+const int YELLOW_GREEN  = gammaCorrect(0x49B509); // $c8
+const int PINK          = gammaCorrect(0xFE67AA); // $4a
+const int BLACK         = gammaCorrect(0x000000); // $00
+const int GREY          = gammaCorrect(0x5B5B5B); // $06
+const int WHITE         = gammaCorrect(0xFFFFFF); // $0e
+const int DARK_GREEN    = gammaCorrect(0x103600); // GREEN - $04
+const int DARK_RED      = gammaCorrect(0x6F001F); // RED - $06
+
 // Above ground background colors are shades of pure green.
 // Anything not pure green is not background.
 // In the original game these are different tree patterns.
-const int BG_0          = 0x000D00;
-const int BG_1          = 0x001A00;
-const int BG_2          = 0x002700;
-const int BG_3          = 0x003400;
-const int TREES[]       = {BG_0, BG_1, BG_2, BG_3};
-const int BARREL_COLOR  = BROWN;
+const int BG_0            = gammaCorrect(0x001800);          
+const int BG_1            = gammaCorrect(0x002400);          
+const int BG_2            = gammaCorrect(0x003000);          
+const int BG_3            = gammaCorrect(0x003C00); // first room
+const int TREES[]         = {BG_0, BG_1, BG_2, BG_3};
+const int BARREL_COLOR    = BROWN;
+const int SNAKE_COLOR     = GREY;
+const int FIRE_COLOR      = ORANGE;
 
-const byte CELL_COUNT   = 10; // In case you want a bigger led string.
-const byte SPAWN_POINT  = 1;  // For stationary/on-screen dangers.
+const byte CELL_COUNT     = 10; // In case you want a bigger led string.
 
 //===================================
 // C E L L - C O N T E N T S
@@ -70,15 +75,18 @@ const byte HOLE_BIT     = 6;  // 6      hole/ladder
 const byte TREASURE_BIT = 7;  // 7      treasure
                               // ** needs overlay graphic
 
-
 //==============================================================================
-// Z P - V A R I A B L E S
+// V A R I A B L E S
 //==============================================================================
 
-volatile  byte lives = 3;
-volatile  byte room = RAND_SEED;              // in place of original's "random" 
-volatile  boolean above = true;               // are you above ground?
-volatile  byte cells[CELL_COUNT];             // indicates contents of each cell
+          byte    lives   = 3;
+          boolean above   = true;     // above/below ground
+volatile  boolean jumping = false;    // directly changed by interrupt
+          byte    harryX  = 85;       // Harry's position on a 0-100 scale
+
+          byte    room    = RAND_SEED; // in place of original's "random" 
+          byte    cells[CELL_COUNT];   // indicates contents of each cell
+          byte    dangers  = room & 0b111;
 
 void initCells() {
   for (byte i = 0; i < CELL_COUNT; i++) {
@@ -117,6 +125,8 @@ void nextRandom(boolean right, boolean above) {
     else {
       lfsrLeft();
     }
+  dangers = room & 0b111;
+  initCells();
   }
   #ifdef DEBUG
     Serial.print("Entering room ");
@@ -144,9 +154,12 @@ int getBackgroundColor() {
 }
 
 void drawDanger(byte cell) {
-  switch (room & 0b111) {
-    case 4:
-      Serial.println(room & 0b111);
+  Serial.println(dangers);
+  switch (dangers) {
+    case 4: // one barrel
+      CircuitPlayground.setPixelColor(cell, BARREL_COLOR);
+      break;
+    case 5: // multiple barrels
       CircuitPlayground.setPixelColor(cell, BARREL_COLOR);
       break;
     default:
@@ -156,7 +169,9 @@ void drawDanger(byte cell) {
 }
 
 void drawCell(byte cell) {
+  // Current state of the cell.
   // These need to be sequenced by precedent.
+  // Does not handle blinking, etc.
   if bitRead(cells[cell], DANGER_BIT) {
     drawDanger(cell);
   }
@@ -165,37 +180,36 @@ void drawCell(byte cell) {
   }
 }
 
-void drawRoom() {
-  parseRoom(); // XXX Might not want this here.
-  for (byte i = 0; i < CELL_COUNT; i++) {
-    drawCell(i);
-  }
-}
-
 void writeCell(byte cell, byte bit, byte value) {
+  // Convenience method to write a specific bit to a cell.
   bitWrite(cells[cell], bit, value);
 }
 
 void parseRoom() {
   // bits 0-2 = dangers
-  if (bitRead(room, 2)) {                   // stationary dangers
-    writeCell(SPAWN_POINT, DANGER_BIT, 1);
+  if (bitRead(room, 2)) {                   // all stationary dangers
+    writeCell(1, DANGER_BIT, 1);
+    if (bitRead(room, 0)) {                 // two/three stationary
+      writeCell(8, DANGER_BIT, 1);          // can't fit three in some cases
+    }
+  }
+}
+
+void drawRoom() {
+  // This is the initial draw of the whole room.
+  parseRoom(); 
+  for (byte i = 0; i < CELL_COUNT; i++) {
+    drawCell(i);
   }
 }
 
 void setup() {
-  CircuitPlayground.begin();
-  //===================================
+  CircuitPlayground.begin(255);  // set to max. brightness to access full range
+  CircuitPlayground.setAccelRange(LIS3DH_RANGE_2_G);  // max. sensitivity
+  CircuitPlayground.redLED(false);
   // I N T E R R U P T S
-  //===================================
-  // 
   // right button -> jump -> D4
   // left button  -> jump -> D5
-  // right run    -> A5   -> D2
-  // right down   -> A4   -> D3
-  // left run     -> A2   -> D9
-  // left down    -> A3   -> D10
-  //
   attachInterrupt(digitalPinToInterrupt(4), nextRight, RISING); 
   attachInterrupt(digitalPinToInterrupt(5), nextLeft, RISING);  
   #ifdef DEBUG
