@@ -4,8 +4,10 @@
 // Based on Pitfall! created by David Crane for Activision,
 // on Johni Marangon's dissasembly and commentary at:
 // https://github.com/johnidm/asm-atari-2600/blob/master/pitfall.asm
-// and evoniuk's analysis at
+// evoniuk's analysis at
 // https://evoniuk.github.io/posts/pitfall.html
+// and Ben Valdes's map at:
+// https://pitfallharry.tripod.com/MapRoom/PitfallMap.png
 
 //=============================================================================
 // C O M P I L E R - S W I T C H E S
