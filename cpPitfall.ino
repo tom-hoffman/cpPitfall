@@ -22,7 +22,7 @@ const byte RAND_SEED    = 0xc4;        // defines the start scene of the game
 
 // color constants
 // Based on translating Atari 2600 colors to RGB, then adjusting as needed.
-// Sticking to original palette as much as possible.
+// Sticking to original colors and palette as much as practical.
 // https://www.randomterrain.com/atari-2600-memories-tia-color-charts.html
 
 int gammaCorrect(int c) {
@@ -33,7 +33,7 @@ int gammaCorrect(int c) {
 }
 
 const int BROWN         = gammaCorrect(0x3A1F00); // $12
-const int YELLOW        = gammaCorrect(0xFEFA40); // $1e
+const int YELLOW        = gammaCorrect(0x5D4100); // $1e
 const int ORANGE        = gammaCorrect(0xFEC6BB); // $3e
 const int RED           = gammaCorrect(0xE14585); // $48
 const int GREEN         = gammaCorrect(0x537E00); // $d6
@@ -45,6 +45,9 @@ const int GREY          = gammaCorrect(0x5B5B5B); // $06
 const int WHITE         = gammaCorrect(0xFFFFFF); // $0e
 const int DARK_GREEN    = gammaCorrect(0x103600); // GREEN - $04
 const int DARK_RED      = gammaCorrect(0x6F001F); // RED - $06
+// non-original colors
+const int VIOLET        = gammaCorrect(0x7D058C);
+
 
 // Above ground background colors are shades of pure green.
 // Anything not pure green is not background.
@@ -54,11 +57,34 @@ const int BG_1            = gammaCorrect(0x002400);
 const int BG_2            = gammaCorrect(0x003000);          
 const int BG_3            = gammaCorrect(0x003C00); // first room
 const int TREES[]         = {BG_0, BG_1, BG_2, BG_3};
-const int BARREL_COLOR    = BROWN;
-const int SNAKE_COLOR     = GREY;
-const int FIRE_COLOR      = ORANGE;
+
+// Object color designations
+const int LOG_COLOR    = gammaCorrect(0x3B1F00);
+const int SNAKE_COLORS[]  = {GREY, VIOLET};
+const int FIRE_COLORS[]   = {DARK_RED, YELLOW};
 
 const byte CELL_COUNT     = 10; // In case you want a bigger led string.
+
+// ==================================
+// R O O M - C O D E S
+// ==================================
+
+// D A N G E R - C O D E S
+// bits 2 1 0
+const byte MLOG1  = 0;    // 000 - one moving log    - money
+const byte MLOG2S = 1;    // 001 - two moving logs   - silver
+const byte MLOG2G = 2;    // 010 - two moving logs   - gold
+const byte MLOG3  = 3;    // 011 - three moving logs - ring
+const byte LOG1   = 4;    // 100 - one log           - money
+const byte LOG3   = 5;    // 101 - three logs        - silver
+const byte FIRE   = 6;    // 110 - fire              - gold
+const byte SNAKE  = 7;    // 111 - snake             - ring
+// T R E A S U R E - C O D E S
+// bits 1 0
+const byte MONEY  = 0;    // 00
+const byte SILVER = 1;    // 01
+const byte GOLD   = 2;    // 02
+const byte RING   = 3;    // 03
 
 //===================================
 // C E L L - C O N T E N T S
@@ -67,22 +93,30 @@ const byte CELL_COUNT     = 10; // In case you want a bigger led string.
                               // above ground
 const byte HARRY_BIT    = 0;  // 0      harry
 const byte VINE_BIT     = 1;  // 1      vine**
-const byte MDANGER_BIT  = 2;  // 2      mobile danger (log/fire)**
+const byte MDANGER_BIT  = 2;  // 2      mobile danger (log/scorpion)**
 const byte DANGER_BIT   = 3;  // 3      stationary danger (cobra/fire/log)
 const byte CROC_BIT     = 4;  // 4      crocodile**
 const byte PIT_BIT      = 5;  // 5      pit (all)
 const byte HOLE_BIT     = 6;  // 6      hole/ladder
 const byte TREASURE_BIT = 7;  // 7      treasure
                               // ** needs overlay graphic
+//===================================
+// T I M E R - B I T S
+//===================================
+                                          // bit -- type
+const byte FLASH_BIT    = 0;              // 0      danger flash/move
+const byte FLASH_MASK   = bit(FLASH_BIT);
 
 //==============================================================================
 // V A R I A B L E S
 //==============================================================================
 
-          byte    lives   = 3;
+          byte    lives   = 3;        // 2 bits
           boolean above   = true;     // above/below ground
-volatile  boolean jumping = false;    // directly changed by interrupt
+volatile  boolean jumping = false;    // directly changed by button interrupt
           byte    harryX  = 85;       // Harry's position on a 0-100 scale
+
+          byte    timers  = 0;        // packed booleans for bool timers
 
           byte    room    = RAND_SEED; // in place of original's "random" 
           byte    cells[CELL_COUNT];   // indicates contents of each cell
@@ -93,6 +127,14 @@ void initCells() {
     cells[i] = 0;
   }
 }
+
+//============
+// T I M I N G 
+//============
+
+// flash is for deadly dangers
+const byte flashPeriod   = 255;
+      long nextFlash      = flashPeriod;
 
 //==============================================================================
 // R O O M - F U N C T I O N S
@@ -148,19 +190,32 @@ void nextLeft() {
   drawRoom();
 }
 
+// color convenience functions
+
 int getBackgroundColor() {
   // Determined by bits six and seven.
   return TREES[room >> 6];
 }
 
+int getFlash() {
+  return bitRead(timers, FLASH_BIT);
+}
+
 void drawDanger(byte cell) {
-  Serial.println(dangers);
+  byte sw = bitRead(timers, FLASH_BIT);
   switch (dangers) {
-    case 4: // one barrel
-      CircuitPlayground.setPixelColor(cell, BARREL_COLOR);
+    case LOG1: 
+    case LOG3: 
+    case MLOG2S: 
+    case MLOG2G: 
+    case MLOG3:
+      CircuitPlayground.setPixelColor(cell, LOG_COLOR);
       break;
-    case 5: // multiple barrels
-      CircuitPlayground.setPixelColor(cell, BARREL_COLOR);
+    case FIRE:
+      CircuitPlayground.setPixelColor(cell, FIRE_COLORS[sw]);
+      break;
+    case SNAKE:
+      CircuitPlayground.setPixelColor(cell, SNAKE_COLORS[sw]);
       break;
     default:
       CircuitPlayground.setPixelColor(cell, getBackgroundColor());
@@ -168,10 +223,30 @@ void drawDanger(byte cell) {
   }
 }
 
+void moveLogs() {
+  for (byte i = 9; i > 0; i--) {
+    //
+  }
+}
+
+boolean containsDanger(byte c) {
+  return ((bitRead(cells[c], DANGER_BIT)) || (bitRead(cells[c], MDANGER_BIT)));
+}
+
+void updateDangers() {
+  if (!(bitRead(dangers, 2))) {
+    moveLogs();
+  }
+  for (byte i = 0; i < CELL_COUNT; i++) {
+    if (containsDanger(i)) {
+      drawDanger(i);
+    }
+  }
+}
+
 void drawCell(byte cell) {
   // Current state of the cell.
-  // These need to be sequenced by precedent.
-  // Does not handle blinking, etc.
+  // These need to be sequenced by precedence.
   if bitRead(cells[cell], DANGER_BIT) {
     drawDanger(cell);
   }
@@ -185,15 +260,37 @@ void writeCell(byte cell, byte bit, byte value) {
   bitWrite(cells[cell], bit, value);
 }
 
-void parseRoom() {
-  // bits 0-2 = dangers
-  if (bitRead(room, 2)) {                   // all stationary dangers
-    writeCell(1, DANGER_BIT, 1);
-    if (bitRead(room, 0)) {                 // two/three stationary
-      writeCell(8, DANGER_BIT, 1);          // can't fit three in some cases
-    }
+void parseMLogs() {
+  writeCell(1, MDANGER_BIT, 1);         // mobile logs
+  if (dangers == MLOG2S) {              // 2 logs close
+    writeCell(3, MDANGER_BIT, 1);
+  }                 
+  else if (dangers == MLOG2G) {         // 2 spaced logs
+    writeCell(4, MDANGER_BIT, 1);
+  }
+  else if (dangers == MLOG3) {
+    writeCell(4, MDANGER_BIT, 1);
+    writeCell(8, MDANGER_BIT, 1);
   }
 }
+
+void parseDangers() {
+  writeCell(1, DANGER_BIT, 1);
+  if (dangers == LOG3) {                 // three stationary
+    writeCell(8, DANGER_BIT, 1);          
+    writeCell(0, DANGER_BIT, 1);
+  }
+}
+
+void parseRoom() {
+  if (bitRead(room, 2)) {                  // all stationary dangers
+    parseDangers();
+  }
+  else {   
+    parseMLogs();
+  }
+}
+
 
 void drawRoom() {
   // This is the initial draw of the whole room.
@@ -216,7 +313,7 @@ void setup() {
     Serial.begin(9600);
     delay(3000);
     Serial.println("Initializing Circuit Pitfall...");
-    CircuitPlayground.setPixelColor(0, BROWN);
+    CircuitPlayground.setPixelColor(0, GREY);
     CircuitPlayground.setPixelColor(1, YELLOW);
     CircuitPlayground.setPixelColor(2, ORANGE);
     CircuitPlayground.setPixelColor(3, RED);
@@ -233,21 +330,17 @@ void setup() {
 }
 
 void loop() {
-
+  // try reading millis() as we go rather than storing per loop
+  if (millis() > nextFlash) {
+    updateDangers();
+    nextFlash = nextFlash + flashPeriod;
+    timers = timers ^ FLASH_MASK; // XOR to toggle the flash bit
+  }
 }
 
 //==============================================================================
 // E N D - N O T E S
 //==============================================================================
-
-
-// 
-// under ground
-// 0      harry
-// 1      mobile danger
-// 2      treasure
-// 3      wall
-
 
 // First sequence of rooms:
 // 196 -> 137 -> 18 -> 37 -> 75
