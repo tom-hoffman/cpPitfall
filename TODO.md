@@ -1,2 +1,3 @@
-// To Do List for Circuit Pitfall
+## To Do List for Circuit Pitfall
 
+* set up new file structure...
