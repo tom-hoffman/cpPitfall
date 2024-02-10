@@ -12,7 +12,7 @@ void setup() {
   #ifdef DEBUG
     debugSetup();
   #endif
-  initCells();
+  resetRoom();
   drawRoom();
 }
 

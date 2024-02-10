@@ -2,7 +2,7 @@
 Pitfall! for Adafruit's Circuit Playground
 
 ## Status
-Pre-alpha development.  Code should run on a Circuit Playground express, but definitely is not a game (yet).
+Pre-alpha development.  Committed code should compile and run on a Circuit Playground express, but definitely is not a game (yet).
 
 ## Goals
 

@@ -67,6 +67,7 @@ const byte CELL_COUNT     = 10; // In case you want a bigger led string.
 // ==================================
 // These indicate object placement in the 10 LED's using 10 bit binary numbers.
 // NOTE: the left/right order is reversed from the gameplay.
+
 const unsigned short BG0_MASK    = 0b1010000101;
 const unsigned short BG1_MASK    = 0b0101001010;
 const unsigned short BG2_MASK    = 0b0010101010;
@@ -77,13 +78,15 @@ const unsigned short BACKGROUND_MASKS[] = {BG0_MASK, BG1_MASK,
 
 const unsigned short CROC_MASK   = 0b0010101000;
 
-const unsigned short HOLE3_MASK  = 0b0010101000;
-const unsigned short LADDER_MASK = 0b0000100000;
+const unsigned short HOLE3_MASK  = 0b0001010100;
+const unsigned short LADDER_MASK = 0b0000010000;
 
-const unsigned short LOG1_MASK   = 0b0000000100;
-const unsigned short LOG2_MASK_A = 0b0000000110;
-const unsigned short LOG2_MASK_B = 0b0000010010;
-const unsigned short LOG3_MASK   = 0b0100010010;
+const unsigned short LOG1_MASK   = 0b0010000000;
+const unsigned short LOG2_MASK_A = 0b0110000000;
+const unsigned short LOG2_MASK_B = 0b0100100000;
+const unsigned short LOG3_MASK   = 0b0100100010;
+
+const byte TREASURE_SPAWN = 8;
 
 // ==================================
 // R O O M - C O D E S
@@ -116,8 +119,8 @@ const byte VINE_BIT     = 1;  // 1      vine
 const byte DANGER_BIT   = 2;  // 2      all non-croc dangers 
 const byte TREE_BIT     = 3;  // 3      background tree trunk
 const byte CROC_BIT     = 4;  // 4      crocodile
-const byte PIT_BIT      = 5;  // 5      pit (all)
-const byte HOLE_BIT     = 6;  // 6      hole/ladder
+const byte HOLE_BIT     = 5;  // 5      pit (all)
+const byte LADDER_BIT     = 6;  // 6      hole/ladder
 const byte TREASURE_BIT = 7;  // 7      treasure
 //===================================
 // T I M E R - B I T S
@@ -139,7 +142,8 @@ volatile  boolean jumping = false;    // directly changed by button interrupt
 
           byte    room    = RAND_SEED; // in place of original's "random" 
           byte    cells[CELL_COUNT];   // indicates contents of each cell
-          byte    dangers  = room & 0b111;
+          byte    dangers = room & 0b111;
+          byte    holes   = room & 0b111000;
 
 
 

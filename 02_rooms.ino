@@ -14,6 +14,12 @@ void lfsrLeft() {
       bitRead(room, 6) ^ bitRead(room, 0)) * 128);
 }
 
+void resetRoom() {
+  dangers = room & 0b111;
+  holes   = room & 0b111000;
+  initCells();
+}
+
 void nextRandom(boolean right, boolean above) {
   // Uses linear feedback shift register to generate next room 
   byte x = 3;       // repeat 3 times if below ground
@@ -27,8 +33,7 @@ void nextRandom(boolean right, boolean above) {
     else {
       lfsrLeft();
     }
-  dangers = room & 0b111;
-  initCells();
+  resetRoom();
   }
   #ifdef DEBUG
     Serial.print("Entering room ");
@@ -120,6 +125,17 @@ void parseBackground() {
 void parseRoom() {
   // this is the main flow chart
   parseBackground();
+
+  // if bits 3-5 are 101 (5)
+  // place treasure NOT holes/crocs/tar/quicksand/water
+  // treasures are determined by bits 0-2
+  // if bits 3-5 are 100 (4)
+  // place crocs, no objects 
+  // AND if bits 0-2 are 010, 011, 110 or 111, add a vine
+  // OTHERWISE
+  // bits 3-5 determine pits
+  // bits 0-2 determine logs/fire/snake
+
 }
 
 
