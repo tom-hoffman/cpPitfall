@@ -20,11 +20,25 @@ int getBackgroundColor(byte c) {
   }
 }
 
+int getTreasureColor() {
+  // this returns the active flashing color
+  if (getFlash()) {
+    return WHITE;
+  }
+  else {
+    return TREASURE_COLORS[dangers & 0b011]; // treasure type bits 1 0
+  }  
+}
+
 boolean containsDanger(byte c) {
   return (bitRead(cells[c], DANGER_BIT));
 }
 
-int getFlash() {
+boolean containsTreasure(byte c) {
+  return (bitRead(cells[c], TREASURE_BIT));
+}
+
+byte getFlash() {
   return bitRead(timers, FLASH_BIT);
 }
 

@@ -16,7 +16,7 @@ void lfsrLeft() {
 
 void resetRoom() {
   dangers = room & 0b111;
-  holes   = room & 0b111000;
+  holes   = (room >> 3) & 0b111;
   initCells();
 }
 
@@ -97,7 +97,12 @@ void updateDangers() {
 void drawCell(byte cell) {
   // Current state of the cell.
   // These need to be sequenced by precedence.
-  CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
+  if (containsTreasure(cell)) {
+    CircuitPlayground.setPixelColor(cell, getTreasureColor());
+  }
+  else {
+    CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
+  }
 }
 
 void parseMLogs() {
@@ -125,20 +130,20 @@ void parseBackground() {
 void parseRoom() {
   // this is the main flow chart
   parseBackground();
-
   // if bits 3-5 are 101 (5)
   // place treasure NOT holes/crocs/tar/quicksand/water
-  // treasures are determined by bits 0-2
+  Serial.println(holes);
+  if (holes == 5) {
+    Serial.println("TREASURE");
+    writeCell(TREASURE_SPAWN, TREASURE_BIT, 1);
+  }
+} 
   // if bits 3-5 are 100 (4)
   // place crocs, no objects 
   // AND if bits 0-2 are 010, 011, 110 or 111, add a vine
   // OTHERWISE
   // bits 3-5 determine pits
   // bits 0-2 determine logs/fire/snake
-
-}
-
-
 
 void drawRoom() {
   // This is the initial draw of the whole room.

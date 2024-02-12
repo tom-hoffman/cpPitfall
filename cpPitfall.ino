@@ -54,13 +54,18 @@ const int BG            = gammaCorrect(0x001800); // (deprecate)
 const int BG_COLOR      = gammaCorrect(0x001800);
 const int TREE_COLOR    = gammaCorrect(0x181800);        
 
-
 // Object color designations
-const int LOG_COLOR       = gammaCorrect(0x3B1F00);
-const int SNAKE_COLORS[]  = {GREY, VIOLET};
-const int FIRE_COLORS[]   = {DARK_RED, YELLOW};
+const int LOG_COLOR         = gammaCorrect(0x3B1F00);
+const int SNAKE_COLORS[]    = {GREY, VIOLET};
+const int FIRE_COLORS[]     = {DARK_RED, YELLOW};
+// Treasure main colors (with flickering bright white)
+const int MONEY_COLOR       = YELLOW_GREEN;
+const int SILVER_COLOR      = GREY;
+const int GOLD_COLOR        = YELLOW;
+const int RING_COLOR        = DARK_RED;
+const int TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
 
-const byte CELL_COUNT     = 10; // In case you want a bigger led string.
+const byte CELL_COUNT       = 10; // In case you want a bigger led string.
 
 // ==================================
 // O B J E C T - M A S K S
@@ -86,7 +91,8 @@ const unsigned short LOG2_MASK_A = 0b0110000000;
 const unsigned short LOG2_MASK_B = 0b0100100000;
 const unsigned short LOG3_MASK   = 0b0100100010;
 
-const byte TREASURE_SPAWN = 8;
+const byte        TREASURE_SPAWN = 1;
+
 
 // ==================================
 // R O O M - C O D E S
@@ -120,32 +126,35 @@ const byte DANGER_BIT   = 2;  // 2      all non-croc dangers
 const byte TREE_BIT     = 3;  // 3      background tree trunk
 const byte CROC_BIT     = 4;  // 4      crocodile
 const byte HOLE_BIT     = 5;  // 5      pit (all)
-const byte LADDER_BIT     = 6;  // 6      hole/ladder
+const byte LADDER_BIT   = 6;  // 6      hole/ladder
 const byte TREASURE_BIT = 7;  // 7      treasure
+
 //===================================
 // T I M E R - B I T S
 //===================================
                                           // bit -- type
 const byte FLASH_BIT    = 0;              // 0      danger flash/move
 const byte FLASH_MASK   = bit(FLASH_BIT);
+const byte FLICKER_BIT  = 1;
+const byte FLICKER_MASK = bit(FLICKER_BIT);
 
 //==============================================================================
 // V A R I A B L E S
 //==============================================================================
 
-          byte    lives   = 3;        // 2 bits
-          boolean above   = true;     // above/below ground
-volatile  boolean jumping = false;    // directly changed by button interrupt
-          byte    harryX  = 85;       // Harry's position on a 0-100 scale
+          byte    lives           = 3;        // 2 bits
+          boolean above           = true;     // above/below ground
+volatile  boolean jumping         = false;    // interrupt from tap?
+          byte    harryX          = 85;       // Harry's position from 0-100 
 
-          byte    timers  = 0;        // packed booleans for bool timers
+          byte    timers          = 0;         // packed booleans for timers
 
-          byte    room    = RAND_SEED; // in place of original's "random" 
-          byte    cells[CELL_COUNT];   // indicates contents of each cell
-          byte    dangers = room & 0b111;
-          byte    holes   = room & 0b111000;
+          byte    room            = RAND_SEED; // original's "random" 
+          byte    cells[CELL_COUNT];           // contents of each cell
+          byte    dangers         = room & 0b111;
+          byte    holes           = room & 0b111000;
 
-
+unsigned int      treasure_state  = 0;    
 
 //============
 // T I M I N G 
