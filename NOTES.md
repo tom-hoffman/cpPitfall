@@ -6,7 +6,3 @@
 Pit layout: .T3210123. (remember it is reversed l/r)
 
 
-## On flash or flicker or other changes
-
-* treasures flicker, don't move, but are permanently collected
-  * need to store state in 5 bits

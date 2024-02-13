@@ -59,10 +59,11 @@ const int LOG_COLOR         = gammaCorrect(0x3B1F00);
 const int SNAKE_COLORS[]    = {GREY, VIOLET};
 const int FIRE_COLORS[]     = {DARK_RED, YELLOW};
 // Treasure main colors (with flickering bright white)
-const int MONEY_COLOR       = YELLOW_GREEN;
+const int MONEY_COLOR       = gammaCorrect(0x086B00);
 const int SILVER_COLOR      = GREY;
 const int GOLD_COLOR        = YELLOW;
 const int RING_COLOR        = DARK_RED;
+const int FLICKER_COLOR     = gammaCorrect(0xAAAAAA);
 const int TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
 
 const byte CELL_COUNT       = 10; // In case you want a bigger led string.
@@ -135,7 +136,7 @@ const byte TREASURE_BIT = 7;  // 7      treasure
                                           // bit -- type
 const byte FLASH_BIT    = 0;              // 0      danger flash/move
 const byte FLASH_MASK   = bit(FLASH_BIT);
-const byte FLICKER_BIT  = 1;
+const byte FLICKER_BIT  = 1;              // 1      flicker treasure
 const byte FLICKER_MASK = bit(FLICKER_BIT);
 
 //==============================================================================
@@ -154,15 +155,24 @@ volatile  boolean jumping         = false;    // interrupt from tap?
           byte    dangers         = room & 0b111;
           byte    holes           = room & 0b111000;
 
-unsigned int      treasure_state  = 0;    
+          byte    treasureArray[32];            // array of rooms with treasures   
+bool      roomContainsTreasure    = false;      // current room has treasure?
+
+unsigned short dirtyCells        = 0b1111111111;
+
 
 //============
 // T I M I N G 
 //============
 
 // flash is for deadly dangers
-const byte flashPeriod   = 255;
-      long nextFlash      = flashPeriod;
+const byte FLASH_PERIOD   = 255;
+      long nextFlash      = FLASH_PERIOD;
+// flicker is for treasure
+const byte SHORT_FLICKER  = 8;
+const byte LONG_FLICKER   = 192;
+      long nextFlicker    = LONG_FLICKER;
+
 
 
 

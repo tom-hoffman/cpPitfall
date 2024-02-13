@@ -12,15 +12,18 @@ void setup() {
   #ifdef DEBUG
     debugSetup();
   #endif
+  initTreasureArray();
   resetRoom();
+  parseRoom();
   drawRoom();
 }
 
 void loop() {
-  // try reading millis() as we go rather than storing per loop
-  if (millis() > nextFlash) {
-    updateDangers();
-    nextFlash = nextFlash + flashPeriod;
-    timers = timers ^ FLASH_MASK; // XOR to toggle the flash bit
+  if (roomContainsTreasure) {
+    flickerTreasure();
   }
+  if (millis() > nextFlash) {
+    flashDangers();
+  }
+  drawRoom();
 }

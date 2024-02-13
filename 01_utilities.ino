@@ -6,10 +6,32 @@ void initCells() {
   }
 }
 
+void initTreasureArray() {
+  byte arrayIndex = 0;
+  byte last = lfsrLeft(RAND_SEED);
+  for (byte rm = RAND_SEED; rm != last; rm = lfsrRight(rm)) {
+    if (((rm >> 3) & 0b111) == 5) {
+      treasureArray[arrayIndex] = rm;
+      arrayIndex++;
+    }
+  }
+}
+
+bool checkRoomForTreasure() {
+  bool t = false;
+  for (byte i = 0; i < 32; i++) {
+    if (treasureArray[i] == room) {
+      t = true;
+    }
+  }
+  return t;
+}
+
 void writeCell(byte cell, byte bit, byte value) {
   // Convenience method to write a specific bit to a cell.
   bitWrite(cells[cell], bit, value);
 }
+
 
 int getBackgroundColor(byte c) {
   if (bitRead(cells[c], TREE_BIT)) {
@@ -22,11 +44,11 @@ int getBackgroundColor(byte c) {
 
 int getTreasureColor() {
   // this returns the active flashing color
-  if (getFlash()) {
-    return WHITE;
+  if (bitRead(timers, FLICKER_BIT)) {
+    return TREASURE_COLORS[dangers & 0b011]; // treasure type bits 1 0
   }
   else {
-    return TREASURE_COLORS[dangers & 0b011]; // treasure type bits 1 0
+    return FLICKER_COLOR;
   }  
 }
 
@@ -40,6 +62,10 @@ boolean containsTreasure(byte c) {
 
 byte getFlash() {
   return bitRead(timers, FLASH_BIT);
+}
+
+bool getFlicker() {
+  return bitRead(timers, FLICKER_BIT);
 }
 
 void debugSetup() {

@@ -2,22 +2,22 @@
 // Functions that parse rooms and the gameplay they contain.
 // Essentially most of the core functions.
 
-void lfsrRight() {
+byte lfsrRight(byte r) {
   // Changes room register, no return value.
-  room = room << 1 | (bitRead(room, 3) ^ bitRead(room, 4) ^ 
-    bitRead(room, 5) ^ bitRead(room, 7));
+  return r << 1 | (bitRead(r, 3) ^ bitRead(r, 4) ^ bitRead(r, 5) ^ bitRead(r, 7));
 }
 
-void lfsrLeft() {
+byte lfsrLeft(byte r) {
   // Changes room register, no return value.
-  room = room >> 1 | ((bitRead(room, 4) ^ bitRead(room, 5) ^ 
-      bitRead(room, 6) ^ bitRead(room, 0)) * 128);
+  return r >> 1 | ((bitRead(r, 4) ^ bitRead(r, 5) ^ bitRead(r, 6) ^ bitRead(r, 0)) * 128);
 }
 
 void resetRoom() {
   dangers = room & 0b111;
   holes   = (room >> 3) & 0b111;
+  roomContainsTreasure = checkRoomForTreasure();
   initCells();
+  dirtyCells        = 0b1111111111;
 }
 
 void nextRandom(boolean right, boolean above) {
@@ -28,10 +28,10 @@ void nextRandom(boolean right, boolean above) {
   }
   for (byte i = 0; i < x; i++) {
     if (right) {
-      lfsrRight();
+      room = lfsrRight(room);
     }
     else {
-      lfsrLeft();
+      room = lfsrLeft(room);
     }
   resetRoom();
   }
@@ -46,16 +46,19 @@ void nextRandom(boolean right, boolean above) {
 void nextRight() {
   // XXX needs to check above/below.
   nextRandom(true, true);
+  parseRoom();
   drawRoom();
 }
 
 void nextLeft() {
   // XXX needs to check above/below.
   nextRandom(false, true);
+  parseRoom();
   drawRoom();
 }
 
 void drawDanger(byte cell) {
+  // this will become getDangerColor
   byte sw = bitRead(timers, FLASH_BIT);
   switch (dangers) {
     case LOG1: 
@@ -79,18 +82,38 @@ void drawDanger(byte cell) {
 
 void moveLogs() {
   for (byte i = 9; i > 0; i--) {
-    //
+    // tbd
   }
 }
 
 void updateDangers() {
-  if (!(bitRead(dangers, 2))) {
-    moveLogs();
-  }
   for (byte i = 0; i < CELL_COUNT; i++) {
     if (containsDanger(i)) {
       drawDanger(i);
     }
+  }
+}
+
+void flashDangers() {
+  if (!(bitRead(dangers, 2))) {
+    moveLogs(); //tbd
+  }
+  updateDangers(); 
+  nextFlash = nextFlash + FLASH_PERIOD;
+  timers = timers ^ FLASH_MASK; // XOR to toggle the flash bit
+}
+
+void flickerTreasure() {
+  if (millis() > nextFlicker) {
+    bool fstate = getFlicker();
+    if (fstate) {
+      nextFlicker = nextFlicker + SHORT_FLICKER;
+    }
+    else {
+      nextFlicker = nextFlicker + LONG_FLICKER;
+    }
+    timers = timers ^ FLICKER_MASK;
+    bitWrite(dirtyCells, TREASURE_SPAWN, 1);
   }
 }
 
@@ -103,6 +126,7 @@ void drawCell(byte cell) {
   else {
     CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
   }
+  bitWrite(dirtyCells, cell, 0);
 }
 
 void parseMLogs() {
@@ -134,7 +158,6 @@ void parseRoom() {
   // place treasure NOT holes/crocs/tar/quicksand/water
   Serial.println(holes);
   if (holes == 5) {
-    Serial.println("TREASURE");
     writeCell(TREASURE_SPAWN, TREASURE_BIT, 1);
   }
 } 
@@ -146,9 +169,9 @@ void parseRoom() {
   // bits 0-2 determine logs/fire/snake
 
 void drawRoom() {
-  // This is the initial draw of the whole room.
-  parseRoom(); 
   for (byte i = 0; i < CELL_COUNT; i++) {
-    drawCell(i);
+    if (bitRead(dirtyCells, i)) {
+      drawCell(i);
+    }
   }
 }
