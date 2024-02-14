@@ -31,7 +31,8 @@ bool roomIsTreasureRoom() {
   return holes == 5;
 }
 
-bool roomHasMobileLogs () {
+bool roomHasMobileLogs() {
+  return (!(roomIsTreasureRoom()) && (!(bitRead(dangers, 2))));
 }
 
 bool roomHasFire () {
