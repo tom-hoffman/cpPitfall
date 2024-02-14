@@ -27,6 +27,25 @@ bool checkRoomForTreasure() {
   return t;
 }
 
+bool roomIsTreasureRoom() {
+  return holes == 5;
+}
+
+bool roomHasMobileLogs () {
+}
+
+bool roomHasFire () {
+
+}
+
+bool roomHasSnake() {
+
+}
+
+bool roomHasStationaryLogs() {
+
+}
+
 void writeCell(byte cell, byte bit, byte value) {
   // Convenience method to write a specific bit to a cell.
   bitWrite(cells[cell], bit, value);
@@ -52,11 +71,13 @@ int getTreasureColor() {
   }  
 }
 
-boolean containsDanger(byte c) {
+
+
+boolean cellContainsDanger(byte c) {
   return (bitRead(cells[c], DANGER_BIT));
 }
 
-boolean containsTreasure(byte c) {
+boolean cellContainsTreasure(byte c) {
   return (bitRead(cells[c], TREASURE_BIT));
 }
 

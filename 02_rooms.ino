@@ -57,50 +57,33 @@ void nextLeft() {
   drawRoom();
 }
 
-void drawDanger(byte cell) {
-  // this will become getDangerColor
+int getDangerColor(byte cell) {
   byte sw = bitRead(timers, FLASH_BIT);
   switch (dangers) {
-    case LOG1: 
-    case LOG3: 
-    case MLOG2S: 
-    case MLOG2G: 
-    case MLOG3:
-      CircuitPlayground.setPixelColor(cell, LOG_COLOR);
-      break;
     case FIRE:
-      CircuitPlayground.setPixelColor(cell, FIRE_COLORS[sw]);
-      break;
+      return FIRE_COLORS[sw];
     case SNAKE:
-      CircuitPlayground.setPixelColor(cell, SNAKE_COLORS[sw]);
-      break;
+      return SNAKE_COLORS[sw];
     default:
-      CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
-      break;
+      return LOG_COLOR;
   }
+}
+
+void flashDangers() {
+  // first move the mobile logs
+  if (!(bitRead(dangers, 2))) {
+    moveLogs(); //tbd
+  }
+  // loop through and find the FIRE or SNAKE to mark as dirty.
+
+  nextFlash = nextFlash + FLASH_PERIOD;
+  timers = timers ^ FLASH_MASK; // XOR to toggle the flash bit
 }
 
 void moveLogs() {
   for (byte i = 9; i > 0; i--) {
     // tbd
   }
-}
-
-void updateDangers() {
-  for (byte i = 0; i < CELL_COUNT; i++) {
-    if (containsDanger(i)) {
-      drawDanger(i);
-    }
-  }
-}
-
-void flashDangers() {
-  if (!(bitRead(dangers, 2))) {
-    moveLogs(); //tbd
-  }
-  updateDangers(); 
-  nextFlash = nextFlash + FLASH_PERIOD;
-  timers = timers ^ FLASH_MASK; // XOR to toggle the flash bit
 }
 
 void flickerTreasure() {
@@ -120,8 +103,11 @@ void flickerTreasure() {
 void drawCell(byte cell) {
   // Current state of the cell.
   // These need to be sequenced by precedence.
-  if (containsTreasure(cell)) {
+  if (cellContainsTreasure(cell)) {
     CircuitPlayground.setPixelColor(cell, getTreasureColor());
+  }
+  else if (cellContainsDanger(cell)) {
+    CircuitPlayground.setPixelColor(cell, getDangerColor(cell));
   }
   else {
     CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
@@ -156,8 +142,7 @@ void parseRoom() {
   parseBackground();
   // if bits 3-5 are 101 (5)
   // place treasure NOT holes/crocs/tar/quicksand/water
-  Serial.println(holes);
-  if (holes == 5) {
+  if (roomIsTreasureRoom()) {
     writeCell(TREASURE_SPAWN, TREASURE_BIT, 1);
   }
 } 
