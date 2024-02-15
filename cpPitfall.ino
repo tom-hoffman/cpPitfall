@@ -152,8 +152,8 @@ volatile  boolean jumping         = false;    // interrupt from tap?
 
           byte    room            = RAND_SEED; // original's "random" 
           byte    cells[CELL_COUNT];           // contents of each cell
-          byte    dangers         = room & 0b111;
-          byte    holes           = room & 0b111000;
+          byte    bits0to2        = room & 0b111;
+          byte    bits3to5        = bits3to5   = (room >> 3) & 0b111;
 
           byte    treasureArray[32];            // array of rooms with treasures   
 bool      roomContainsTreasure    = false;      // current room has treasure?

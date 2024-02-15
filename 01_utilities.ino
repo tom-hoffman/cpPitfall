@@ -28,15 +28,24 @@ bool checkRoomForTreasure() {
 }
 
 bool roomIsTreasureRoom() {
-  return holes == 5;
+  // True if room initially has treasure.  It might be gone.
+  return bits3to5 == 5;
+}
+
+bool roomHasCrocs() {
+  return bits3to5 == 4;
+}
+
+bool roomHasDanger() {
+  return !(roomIsTreasureRoom() || roomHasCrocs());
 }
 
 bool roomHasMobileLogs() {
-  return (!(roomIsTreasureRoom()) && (!(bitRead(dangers, 2))));
+  return (roomHasDanger() && (!(bitRead(bits0to2, 2))));
 }
 
-bool roomHasFire () {
-
+bool roomHasFire() {
+  return (roomHasDanger() && (bits0to2 = FIRE));
 }
 
 bool roomHasSnake() {
@@ -65,7 +74,7 @@ int getBackgroundColor(byte c) {
 int getTreasureColor() {
   // this returns the active flashing color
   if (bitRead(timers, FLICKER_BIT)) {
-    return TREASURE_COLORS[dangers & 0b011]; // treasure type bits 1 0
+    return TREASURE_COLORS[bits0to2 & 0b011]; // treasure type bits 1 0
   }
   else {
     return FLICKER_COLOR;

@@ -13,8 +13,8 @@ byte lfsrLeft(byte r) {
 }
 
 void resetRoom() {
-  dangers = room & 0b111;
-  holes   = (room >> 3) & 0b111;
+  bits0to2 = room & 0b111;
+  bits3to5   = (room >> 3) & 0b111;
   roomContainsTreasure = checkRoomForTreasure();
   initCells();
   dirtyCells        = 0b1111111111;
@@ -59,7 +59,7 @@ void nextLeft() {
 
 int getDangerColor(byte cell) {
   byte sw = bitRead(timers, FLASH_BIT);
-  switch (dangers) {
+  switch (bits0to2) {
     case FIRE:
       return FIRE_COLORS[sw];
     case SNAKE:
@@ -71,7 +71,7 @@ int getDangerColor(byte cell) {
 
 void flashDangers() {
   // first move the mobile logs
-  if (!(bitRead(dangers, 2))) {
+  if (!(bitRead(bits0to2, 2))) {
     moveLogs(); //tbd
   }
   // loop through and find the FIRE or SNAKE to mark as dirty.
