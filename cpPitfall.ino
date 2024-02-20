@@ -20,7 +20,7 @@
 //=============================================================================
 
 // initial value for the random number generator:
-const byte RAND_SEED    = 0xc4;        // defines the start scene of the game
+const uint8_t RAND_SEED    = 0xc4;        // defines the start scene of the game
 
 // color constants
 // Based on translating Atari 2600 colors to RGB, then adjusting as needed.
@@ -28,45 +28,45 @@ const byte RAND_SEED    = 0xc4;        // defines the start scene of the game
 // https://www.randomterrain.com/atari-2600-memories-tia-color-charts.html
 
 int gammaCorrect(int c) {
-  byte red   = CircuitPlayground.gamma8(c >> 16);
-  byte green = CircuitPlayground.gamma8((c & 0x00FF00)  >> 8);
-  byte blue  = CircuitPlayground.gamma8(c & 0x0000FF);
+  uint8_t red   = CircuitPlayground.gamma8(c >> 16);
+  uint8_t green = CircuitPlayground.gamma8((c & 0x00FF00)  >> 8);
+  uint8_t blue  = CircuitPlayground.gamma8(c & 0x0000FF);
   return ((red << 16L) | (green << 8L) | blue);
 }
 
-const int BROWN         = gammaCorrect(0x3A1F00); // $12
-const int YELLOW        = gammaCorrect(0x5D4100); // $1e
-const int ORANGE        = gammaCorrect(0xFEC6BB); // $3e
-const int RED           = gammaCorrect(0xE14585); // $48
-const int GREEN         = gammaCorrect(0x537E00); // $d6
-const int BLUE          = gammaCorrect(0x006957); // $a4
-const int YELLOW_GREEN  = gammaCorrect(0x49B509); // $c8
-const int PINK          = gammaCorrect(0xFE67AA); // $4a
-const int BLACK         = gammaCorrect(0x000000); // $00
-const int GREY          = gammaCorrect(0x5B5B5B); // $06
-const int WHITE         = gammaCorrect(0xFFFFFF); // $0e
-const int DARK_GREEN    = gammaCorrect(0x103600); // GREEN - $04
-const int DARK_RED      = gammaCorrect(0x6F001F); // RED - $06
+const uint32_t BROWN         = gammaCorrect(0x3A1F00); // $12
+const uint32_t YELLOW        = gammaCorrect(0x5D4100); // $1e
+const uint32_t ORANGE        = gammaCorrect(0xFEC6BB); // $3e
+const uint32_t RED           = gammaCorrect(0xE14585); // $48
+const uint32_t GREEN         = gammaCorrect(0x537E00); // $d6
+const uint32_t BLUE          = gammaCorrect(0x006957); // $a4
+const uint32_t YELLOW_GREEN  = gammaCorrect(0x49B509); // $c8
+const uint32_t PINK          = gammaCorrect(0xFE67AA); // $4a
+const uint32_t BLACK         = gammaCorrect(0x000000); // $00
+const uint32_t GREY          = gammaCorrect(0x5B5B5B); // $06
+const uint32_t WHITE         = gammaCorrect(0xFFFFFF); // $0e
+const uint32_t DARK_GREEN    = gammaCorrect(0x103600); // GREEN - $04
+const uint32_t DARK_RED      = gammaCorrect(0x6F001F); // RED - $06
 // non-original colors
-const int VIOLET        = gammaCorrect(0x7D058C);
+const uint32_t VIOLET        = gammaCorrect(0x7D058C);
 
-const int BG            = gammaCorrect(0x001800); // (deprecate)
-const int BG_COLOR      = gammaCorrect(0x001800);
-const int TREE_COLOR    = gammaCorrect(0x181800);        
+const uint32_t BG            = gammaCorrect(0x001800); // (deprecate)
+const uint32_t BG_COLOR      = gammaCorrect(0x001800);
+const uint32_t TREE_COLOR    = gammaCorrect(0x181800);        
 
 // Object color designations
-const int LOG_COLOR         = gammaCorrect(0x3B1F00);
-const int SNAKE_COLORS[]    = {GREY, VIOLET};
-const int FIRE_COLORS[]     = {DARK_RED, YELLOW};
+const uint32_t LOG_COLOR         = gammaCorrect(0x3B1F00);
+const uint32_t SNAKE_COLORS[]    = {GREY, VIOLET};
+const uint32_t FIRE_COLORS[]     = {DARK_RED, YELLOW};
 // Treasure main colors (with flickering bright white)
-const int MONEY_COLOR       = gammaCorrect(0x086B00);
-const int SILVER_COLOR      = GREY;
-const int GOLD_COLOR        = YELLOW;
-const int RING_COLOR        = DARK_RED;
-const int FLICKER_COLOR     = gammaCorrect(0xAAAAAA);
-const int TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
+const uint32_t MONEY_COLOR       = gammaCorrect(0x086B00);
+const uint32_t SILVER_COLOR      = GREY;
+const uint32_t GOLD_COLOR        = YELLOW;
+const uint32_t RING_COLOR        = DARK_RED;
+const uint32_t FLICKER_COLOR     = gammaCorrect(0xAAAAAA);
+const uint32_t TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
 
-const byte CELL_COUNT       = 10; // In case you want a bigger led string.
+const uint8_t CELL_COUNT       = 10; // In case you want a bigger led string.
 
 // ==================================
 // O B J E C T - M A S K S
@@ -74,91 +74,94 @@ const byte CELL_COUNT       = 10; // In case you want a bigger led string.
 // These indicate object placement in the 10 LED's using 10 bit binary numbers.
 // NOTE: the left/right order is reversed from the gameplay.
 
-const unsigned short BG0_MASK    = 0b1010000101;
-const unsigned short BG1_MASK    = 0b0101001010;
-const unsigned short BG2_MASK    = 0b0010101010;
-const unsigned short BG3_MASK    = 0b0010110100;
+const uint16_t BG0_MASK    = 0b1010000101;
+const uint16_t BG1_MASK    = 0b0101001010;
+const uint16_t BG2_MASK    = 0b0010101010;
+const uint16_t BG3_MASK    = 0b0010110100;
 
-const unsigned short BACKGROUND_MASKS[] = {BG0_MASK, BG1_MASK, 
+const uint16_t BACKGROUND_MASKS[] = {BG0_MASK, BG1_MASK, 
                                            BG2_MASK, BG3_MASK};
 
-const unsigned short CROC_MASK   = 0b0010101000;
+const uint16_t CROC_MASK   = 0b0010101000;
 
-const unsigned short HOLE3_MASK  = 0b0001010100;
-const unsigned short LADDER_MASK = 0b0000010000;
+const uint16_t HOLE3_MASK  = 0b0001010100;
+const uint16_t LADDER_MASK = 0b0000010000;
 
-const unsigned short LOG1_MASK   = 0b0010000000;
-const unsigned short LOG2_MASK_A = 0b0110000000;
-const unsigned short LOG2_MASK_B = 0b0100100000;
-const unsigned short LOG3_MASK   = 0b0100100010;
+const uint16_t LOG1_MASK   = 0b0010000000;
+const uint16_t LOG2_MASK_A = 0b0110000000;
+const uint16_t LOG2_MASK_B = 0b0100100000;
+const uint16_t LOG3_MASK   = 0b0100100010;
 
-const byte        TREASURE_SPAWN = 1;
+const uint8_t        TREASURE_SPAWN = 1;
 
 
 // ==================================
 // R O O M - C O D E S
 // ==================================
-
 // D A N G E R - C O D E S
 // bits 2 1 0
-const byte MLOG1  = 0;    // 000 - one moving log    - money
-const byte MLOG2S = 1;    // 001 - two moving logs   - silver
-const byte MLOG2G = 2;    // 010 - two moving logs   - gold
-const byte MLOG3  = 3;    // 011 - three moving logs - ring
-const byte LOG1   = 4;    // 100 - one log           - money
-const byte LOG3   = 5;    // 101 - three logs        - silver
-const byte FIRE   = 6;    // 110 - fire              - gold
-const byte SNAKE  = 7;    // 111 - snake             - ring
+const uint8_t MLOG1  = 0;    // 000 - one moving log    - money
+const uint8_t MLOG2S = 1;    // 001 - two moving logs   - silver
+const uint8_t MLOG2G = 2;    // 010 - two moving logs   - gold
+const uint8_t MLOG3  = 3;    // 011 - three moving logs - ring
+const uint8_t LOG1   = 4;    // 100 - one log           - money
+const uint8_t LOG3   = 5;    // 101 - three logs        - silver
+const uint8_t FIRE   = 6;    // 110 - fire              - gold
+const uint8_t SNAKE  = 7;    // 111 - snake             - ring
 // T R E A S U R E - C O D E S
 // bits 1 0
-const byte MONEY  = 0;    // 00
-const byte SILVER = 1;    // 01
-const byte GOLD   = 2;    // 02
-const byte RING   = 3;    // 03
+const uint8_t MONEY  = 0;    // 00
+const uint8_t SILVER = 1;    // 01
+const uint8_t GOLD   = 2;    // 02
+const uint8_t RING   = 3;    // 03
+
+//===================================
+// P I T - C O D E S
+//===================================
 
 //===================================
 // C E L L - C O N T E N T S
 //===================================
                               // bit -- type
                               // above ground
-const byte HARRY_BIT    = 0;  // 0      harry
-const byte VINE_BIT     = 1;  // 1      vine
-const byte DANGER_BIT   = 2;  // 2      all non-croc dangers 
-const byte TREE_BIT     = 3;  // 3      background tree trunk
-const byte CROC_BIT     = 4;  // 4      crocodile
-const byte HOLE_BIT     = 5;  // 5      pit (all)
-const byte LADDER_BIT   = 6;  // 6      hole/ladder
-const byte TREASURE_BIT = 7;  // 7      treasure
+const uint8_t HARRY_BIT    = 0;  // 0      harry
+const uint8_t VINE_BIT     = 1;  // 1      vine
+const uint8_t DANGER_BIT   = 2;  // 2      all non-croc dangers 
+const uint8_t TREE_BIT     = 3;  // 3      background tree trunk
+const uint8_t CROC_BIT     = 4;  // 4      crocodile
+const uint8_t HOLE_BIT     = 5;  // 5      pit (all)
+const uint8_t LADDER_BIT   = 6;  // 6      hole/ladder
+const uint8_t TREASURE_BIT = 7;  // 7      treasure
 
 //===================================
 // T I M E R - B I T S
 //===================================
                                           // bit -- type
-const byte FLASH_BIT    = 0;              // 0      danger flash/move
-const byte FLASH_MASK   = bit(FLASH_BIT);
-const byte FLICKER_BIT  = 1;              // 1      flicker treasure
-const byte FLICKER_MASK = bit(FLICKER_BIT);
+const uint8_t FLASH_BIT    = 0;              // 0      danger flash/move
+const uint8_t FLASH_MASK   = bit(FLASH_BIT);
+const uint8_t FLICKER_BIT  = 1;              // 1      flicker treasure
+const uint8_t FLICKER_MASK = bit(FLICKER_BIT);
 
 //==============================================================================
 // V A R I A B L E S
 //==============================================================================
 
-          byte    lives           = 3;        // 2 bits
-          boolean above           = true;     // above/below ground
-volatile  boolean jumping         = false;    // interrupt from tap?
-          byte    harryX          = 85;       // Harry's position from 0-100 
+          uint8_t    lives           = 3;        // 2 bits
+          bool       above           = true;     // above/below ground
+volatile  bool       jumping         = false;    // interrupt from tap?
+          uint8_t    harryX          = 85;       // Harry's position from 0-100 
 
-          byte    timers          = 0;         // packed booleans for timers
+          uint8_t    timers          = 0;         // packed booleans for timers
 
-          byte    room            = RAND_SEED; // original's "random" 
-          byte    cells[CELL_COUNT];           // contents of each cell
-          byte    bits0to2        = room & 0b111;
-          byte    bits3to5        = bits3to5   = (room >> 3) & 0b111;
+          uint8_t    room            = RAND_SEED; // original's "random" 
+          uint8_t    cells[CELL_COUNT];           // contents of each cell
+          uint8_t    bits0to2        = room & 0b111;
+          uint8_t    bits3to5        = bits3to5   = (room >> 3) & 0b111;
 
-          byte    treasureArray[32];            // array of rooms with treasures   
+          uint8_t    treasureArray[32];            // array of rooms with treasures   
 bool      roomContainsTreasure    = false;      // current room has treasure?
 
-unsigned short dirtyCells        = 0b1111111111;
+uint16_t dirtyCells        = 0b1111111111;
 
 
 //============
@@ -166,12 +169,12 @@ unsigned short dirtyCells        = 0b1111111111;
 //============
 
 // flash is for deadly dangers
-const byte FLASH_PERIOD   = 255;
-      long nextFlash      = FLASH_PERIOD;
+const uint8_t FLASH_PERIOD   = 255;
+      uint32_t nextFlash     = FLASH_PERIOD;
 // flicker is for treasure
-const byte SHORT_FLICKER  = 8;
-const byte LONG_FLICKER   = 192;
-      long nextFlicker    = LONG_FLICKER;
+const uint8_t SHORT_FLICKER  = 8;
+const uint8_t LONG_FLICKER   = 192;
+      uint32_t nextFlicker   = LONG_FLICKER;
 
 
 

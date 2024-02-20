@@ -1,15 +1,15 @@
 // Various utility functions for Circuit Pitfall.
 
 void initCells() {
-  for (byte i = 0; i < CELL_COUNT; i++) {
+  for (uint8_t i = 0; i < CELL_COUNT; i++) {
     cells[i] = 0;
   }
 }
 
 void initTreasureArray() {
-  byte arrayIndex = 0;
-  byte last = lfsrLeft(RAND_SEED);
-  for (byte rm = RAND_SEED; rm != last; rm = lfsrRight(rm)) {
+  uint8_t arrayIndex = 0;
+  uint8_t last = lfsrLeft(RAND_SEED);
+  for (uint8_t rm = RAND_SEED; rm != last; rm = lfsrRight(rm)) {
     if (((rm >> 3) & 0b111) == 5) {
       treasureArray[arrayIndex] = rm;
       arrayIndex++;
@@ -19,7 +19,7 @@ void initTreasureArray() {
 
 bool checkRoomForTreasure() {
   bool t = false;
-  for (byte i = 0; i < 32; i++) {
+  for (uint8_t i = 0; i < 32; i++) {
     if (treasureArray[i] == room) {
       t = true;
     }
@@ -56,13 +56,13 @@ bool roomHasStationaryLogs() {
 
 }
 
-void writeCell(byte cell, byte bit, byte value) {
+void writeCell(uint8_t cell, uint8_t bit, uint8_t value) {
   // Convenience method to write a specific bit to a cell.
   bitWrite(cells[cell], bit, value);
 }
 
 
-int getBackgroundColor(byte c) {
+int getBackgroundColor(uint8_t c) {
   if (bitRead(cells[c], TREE_BIT)) {
     return (TREE_COLOR);
   }
@@ -83,15 +83,15 @@ int getTreasureColor() {
 
 
 
-boolean cellContainsDanger(byte c) {
+boolean cellContainsDanger(uint8_t c) {
   return (bitRead(cells[c], DANGER_BIT));
 }
 
-boolean cellContainsTreasure(byte c) {
+boolean cellContainsTreasure(uint8_t c) {
   return (bitRead(cells[c], TREASURE_BIT));
 }
 
-byte getFlash() {
+uint8_t getFlash() {
   return bitRead(timers, FLASH_BIT);
 }
 

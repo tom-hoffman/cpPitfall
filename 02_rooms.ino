@@ -2,12 +2,12 @@
 // Functions that parse rooms and the gameplay they contain.
 // Essentially most of the core functions.
 
-byte lfsrRight(byte r) {
+uint8_t lfsrRight(uint8_t r) {
   // Changes room register, no return value.
   return r << 1 | (bitRead(r, 3) ^ bitRead(r, 4) ^ bitRead(r, 5) ^ bitRead(r, 7));
 }
 
-byte lfsrLeft(byte r) {
+uint8_t lfsrLeft(uint8_t r) {
   // Changes room register, no return value.
   return r >> 1 | ((bitRead(r, 4) ^ bitRead(r, 5) ^ bitRead(r, 6) ^ bitRead(r, 0)) * 128);
 }
@@ -22,11 +22,11 @@ void resetRoom() {
 
 void nextRandom(boolean right, boolean above) {
   // Uses linear feedback shift register to generate next room 
-  byte x = 3;       // repeat 3 times if below ground
+  uint8_t x = 3;       // repeat 3 times if below ground
   if (above) {      // just once if above ground
     x = 1;
   }
-  for (byte i = 0; i < x; i++) {
+  for (uint8_t i = 0; i < x; i++) {
     if (right) {
       room = lfsrRight(room);
     }
@@ -57,8 +57,8 @@ void nextLeft() {
   drawRoom();
 }
 
-int getDangerColor(byte cell) {
-  byte sw = bitRead(timers, FLASH_BIT);
+int getDangerColor(uint8_t cell) {
+  uint8_t sw = bitRead(timers, FLASH_BIT);
   switch (bits0to2) {
     case FIRE:
       return FIRE_COLORS[sw];
@@ -81,7 +81,7 @@ void flashDangers() {
 }
 
 void moveLogs() {
-  for (byte i = 9; i > 0; i--) {
+  for (uint8_t i = 9; i > 0; i--) {
     // tbd
   }
 }
@@ -100,7 +100,7 @@ void flickerTreasure() {
   }
 }
 
-void drawCell(byte cell) {
+void drawCell(uint8_t cell) {
   // Current state of the cell.
   // These need to be sequenced by precedence.
   if (cellContainsTreasure(cell)) {
@@ -123,10 +123,10 @@ void parseDangers() {
 
 }
 
-void parseObjectMask(short mask, byte offset) {
+void parseObjectMask(short mask, uint8_t offset) {
   // Reads the starting positions from a binary mask; 
   // writes the value to the cells array.
-  for (byte i = 0; i <= CELL_COUNT; i++) {
+  for (uint8_t i = 0; i <= CELL_COUNT; i++) {
     if (bitRead(mask, i)) {
       writeCell(i, offset, 1);
     }
@@ -154,7 +154,7 @@ void parseRoom() {
   // bits 0-2 determine logs/fire/snake
 
 void drawRoom() {
-  for (byte i = 0; i < CELL_COUNT; i++) {
+  for (uint8_t i = 0; i < CELL_COUNT; i++) {
     if (bitRead(dirtyCells, i)) {
       drawCell(i);
     }
