@@ -69,7 +69,7 @@ int getDangerColor(uint8_t cell) {
   }
 }
 
-void flashDangers() {
+void flashDangers() { // old code
   // first move the mobile logs
   if (!(bitRead(bits0to2, 2))) {
     moveLogs(); //tbd
@@ -80,7 +80,7 @@ void flashDangers() {
   timers = timers ^ FLASH_MASK; // XOR to toggle the flash bit
 }
 
-void moveLogs() {
+void moveLogs() { // old code
   for (uint8_t i = 9; i > 0; i--) {
     // tbd
   }
@@ -115,14 +115,6 @@ void drawCell(uint8_t cell) {
   bitWrite(dirtyCells, cell, 0);
 }
 
-void parseMLogs() {
-
-}
-
-void parseDangers() {
-
-}
-
 void parseObjectMask(short mask, uint8_t offset) {
   // Reads the starting positions from a binary mask; 
   // writes the value to the cells array.
@@ -154,7 +146,7 @@ void parseRoom() {
   // bits 0-2 determine logs/fire/snake
 
 void drawRoom() {
-  for (uint8_t i = 0; i < CELL_COUNT; i++) {
+  for (byte i = 0; i < CELL_COUNT; i++) {
     if (bitRead(dirtyCells, i)) {
       drawCell(i);
     }

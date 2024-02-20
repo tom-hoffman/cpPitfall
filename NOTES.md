@@ -5,4 +5,20 @@
 
 Pit layout: .T3210123. (remember it is reversed l/r)
 
+## Music
+Sound tables start at 2586 in disassembled code.
+The 2600 could make 32 mostly out of tune pitches.
+Presumably most of the numbers in the table are the pitches, 
+since they're almost all $00 - $1F.  Some that are out of range might be
+end codes.
+https://garrykitchen.medium.com/how-i-fixed-ataris-awful-music-2d21abd7930d
+https://www.randomterrain.com/atari-2600-memories-music-and-sound.html
 
+## Timing:
+Based on original with rounding.  Adjust as needed.
+* running across screen 5 seconds (probably keep this and adjust other timings)
+* running across one cell 0.5 seconds
+* original pit closed time 2.5 seconds (our pit is 7 wide to accomodate crocs)
+* our pit closed time should start at 4 seconds
+* open cycle 1.5 seconds
+* pit cycle runs continuously

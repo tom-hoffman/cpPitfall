@@ -9,6 +9,8 @@
 // and Ben Valdes's map at:
 // https://pitfallharry.tripod.com/MapRoom/PitfallMap.png
 
+// This file contains constant and varible declarations only.
+
 //=============================================================================
 // C O M P I L E R - S W I T C H E S
 //=============================================================================
@@ -33,7 +35,7 @@ int gammaCorrect(int c) {
   uint8_t blue  = CircuitPlayground.gamma8(c & 0x0000FF);
   return ((red << 16L) | (green << 8L) | blue);
 }
-
+// trailing code comment is original color from disassembly
 const uint32_t BROWN         = gammaCorrect(0x3A1F00); // $12
 const uint32_t YELLOW        = gammaCorrect(0x5D4100); // $1e
 const uint32_t ORANGE        = gammaCorrect(0xFEC6BB); // $3e
@@ -80,7 +82,7 @@ const uint16_t BG2_MASK    = 0b0010101010;
 const uint16_t BG3_MASK    = 0b0010110100;
 
 const uint16_t BACKGROUND_MASKS[] = {BG0_MASK, BG1_MASK, 
-                                           BG2_MASK, BG3_MASK};
+                                     BG2_MASK, BG3_MASK};
 
 const uint16_t CROC_MASK   = 0b0010101000;
 
@@ -93,6 +95,18 @@ const uint16_t LOG2_MASK_B = 0b0100100000;
 const uint16_t LOG3_MASK   = 0b0100100010;
 
 const uint8_t        TREASURE_SPAWN = 1;
+
+// pit animation masks
+// layout: .T3210123. (remember it is reversed l/r)
+const uint16_t PIT0_MASK   = 0b0000000000;
+const uint16_t PIT1_MASK   = 0b0000010000;
+const uint16_t PIT2_MASK   = 0b0000111000;
+const uint16_t PIT3_MASK   = 0b0001111100;
+const uint16_t PIT4_MASK   = 0b0011111110;
+const uint16_t PIT_MASKS[] = {PIT0_MASK, PIT1_MASK, PIT2_MASK, 
+                              PIT3_MASK, PIT4_MASK};
+
+
 
 
 // ==================================
@@ -142,12 +156,14 @@ const uint8_t TREASURE_BIT = 7;  // 7      treasure
 //===================================
 // T I M E R - B I T S
 //===================================
-                                          // bit -- type
-const uint8_t FLASH_BIT    = 0;              // 0      danger flash/move
-const uint8_t FLASH_MASK   = bit(FLASH_BIT);
-const uint8_t FLICKER_BIT  = 1;              // 1      flicker treasure
-const uint8_t FLICKER_MASK = bit(FLICKER_BIT);
-
+                                               // bit --  type
+const uint8_t FLASH_BIT           = 0;              // 0   danger flash/move
+const uint8_t FLASH_MASK          = bit(FLASH_BIT);
+const uint8_t FLICKER_BIT         = 1;              // 1   flicker treasure
+const uint8_t FLICKER_MASK        = bit(FLICKER_BIT);
+const uint8_t PIT_TRANSITION_BIT  = 2;              // 2   pit in transition
+const uint8_t PIT_TRANSITION_MASK = bit(PIT_TRANSITION_BIT);
+const uint8_t PIT_STATUS_MASK     = 0b00011111;     // a five bit value
 //==============================================================================
 // V A R I A B L E S
 //==============================================================================
@@ -158,7 +174,7 @@ volatile  bool       jumping         = false;     // interrupt from tap?
           uint8_t    harryX          = 85;        // Harry's position from 0-100 
 
           uint8_t    timers          = 0;         // packed booleans for timers
-
+          uint8_t    pitStatus       = 0;         // 5 bits of pit status
           uint8_t    room            = RAND_SEED; // original's "random" 
           uint8_t    cells[CELL_COUNT];           // contents of each cell
           uint8_t    bits0to2        = room & 0b111;
