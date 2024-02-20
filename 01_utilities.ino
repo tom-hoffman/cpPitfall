@@ -29,11 +29,11 @@ bool checkRoomForTreasure() {
 
 bool roomIsTreasureRoom() {
   // True if room initially has treasure.  It might be gone.
-  return bits3to5 == 5;
+  return bits3to5 == SHIFTING_TART;
 }
 
 bool roomHasCrocs() {
-  return bits3to5 == 4;
+  return bits3to5 == CROCS;
 }
 
 bool roomHasDanger() {
@@ -43,24 +43,43 @@ bool roomHasDanger() {
 bool roomHasMobileLogs() {
   return (roomHasDanger() && (!(bitRead(bits0to2, 2))));
 }
+// may not need these...
+bool roomHasOneMobileLog() {
+  return (roomHasDanger() && (!(bitRead(bits0to2, MLOG1))));
+}
+
+bool roomHasTwoSilverLogs() {
+  return (roomHasDanger() && (!(bitRead(bits0to2, MLOG2S))));
+}
+
+bool roomHasTwoGoldLogs() {
+  return (roomHasDanger() && (!(bitRead(bits0to2, MLOG2G))));
+}
+
+bool roomHasThreeMobileLogs() {
+  return (roomHasDanger() && (!(bitRead(bits0to2, MLOG3))));
+}
+
+bool roomHasOneStationaryLog() {
+  return (roomHasDanger() && (!(bitRead(bits0to2, LOG1))));
+}
+
+bool roomHasThreeStationaryLogs() {
+  return (roomHasDanger() && (!(bitRead(bits0to2, LOG3))));
+}
 
 bool roomHasFire() {
   return (roomHasDanger() && (bits0to2 = FIRE));
 }
 
 bool roomHasSnake() {
-
-}
-
-bool roomHasStationaryLogs() {
-
+  return (roomHasDanger() && (bits0to2 = SNAKE));
 }
 
 void writeCell(uint8_t cell, uint8_t bit, uint8_t value) {
   // Convenience method to write a specific bit to a cell.
   bitWrite(cells[cell], bit, value);
 }
-
 
 int getBackgroundColor(uint8_t c) {
   if (bitRead(cells[c], TREE_BIT)) {
@@ -80,8 +99,6 @@ int getTreasureColor() {
     return FLICKER_COLOR;
   }  
 }
-
-
 
 boolean cellContainsDanger(uint8_t c) {
   return (bitRead(cells[c], DANGER_BIT));

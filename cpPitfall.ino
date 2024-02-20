@@ -112,12 +112,18 @@ const uint8_t SNAKE  = 7;    // 111 - snake             - ring
 // bits 1 0
 const uint8_t MONEY  = 0;    // 00
 const uint8_t SILVER = 1;    // 01
-const uint8_t GOLD   = 2;    // 02
-const uint8_t RING   = 3;    // 03
-
-//===================================
+const uint8_t GOLD   = 2;    // 10
+const uint8_t RING   = 3;    // 11
 // P I T - C O D E S
-//===================================
+// bits 5 4 3
+const uint8_t HOLE1         = 0;  // 000
+const uint8_t HOLE3         = 1;  // 001
+const uint8_t STATIC_TAR    = 2;  // 010
+const uint8_t STATIC_QS     = 3;  // 011
+const uint8_t CROCS         = 4;  // 100
+const uint8_t SHIFTING_TART = 5;  // 101 (with treasure)
+const uint8_t SHIFTING_TAR  = 6;  // 110 (no treasure)
+const uint8_t SHIFTING_QS   = 7;  // 111
 
 //===================================
 // C E L L - C O N T E N T S
@@ -146,10 +152,10 @@ const uint8_t FLICKER_MASK = bit(FLICKER_BIT);
 // V A R I A B L E S
 //==============================================================================
 
-          uint8_t    lives           = 3;        // 2 bits
-          bool       above           = true;     // above/below ground
-volatile  bool       jumping         = false;    // interrupt from tap?
-          uint8_t    harryX          = 85;       // Harry's position from 0-100 
+          uint8_t    lives           = 3;         // 2 bits
+          bool       above           = true;      // above/below ground
+volatile  bool       jumping         = false;     // interrupt from tap?
+          uint8_t    harryX          = 85;        // Harry's position from 0-100 
 
           uint8_t    timers          = 0;         // packed booleans for timers
 
@@ -158,8 +164,8 @@ volatile  bool       jumping         = false;    // interrupt from tap?
           uint8_t    bits0to2        = room & 0b111;
           uint8_t    bits3to5        = bits3to5   = (room >> 3) & 0b111;
 
-          uint8_t    treasureArray[32];            // array of rooms with treasures   
-bool      roomContainsTreasure    = false;      // current room has treasure?
+          uint8_t    treasureArray[32];           // array of rooms with treasures   
+bool      roomContainsTreasure    = false;        // current room has treasure?
 
 uint16_t dirtyCells        = 0b1111111111;
 
@@ -175,8 +181,3 @@ const uint8_t FLASH_PERIOD   = 255;
 const uint8_t SHORT_FLICKER  = 8;
 const uint8_t LONG_FLICKER   = 192;
       uint32_t nextFlicker   = LONG_FLICKER;
-
-
-
-
-
