@@ -26,4 +26,5 @@ Pre-alpha development.  Committed code should compile and run on a Circuit Playg
 * Coded using only base Arduino C and the CircuitPlayground library.
 * When practical, use binary numbers and operators.
 * Keep the overall code lean, simple and fast, especially using minimal memory to store game state.
+* Some of this is premature optimization and writing out binary calculations that the compiler would probably implement in assembler anyhow.
 * Yes, I am using a bunch of global variables, but this is intentional and intended to be close in style to Pitfall!'s 6502 assembly code.

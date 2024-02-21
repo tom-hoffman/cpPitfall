@@ -22,3 +22,13 @@ Based on original with rounding.  Adjust as needed.
 * our pit closed time should start at 4 seconds
 * open cycle 1.5 seconds
 * pit cycle runs continuously
+
+Write an algorithm that will return the current state of the pit based on any input of millis.
+* Harry's speed = 512 milli per cell
+* crossing 7 cell pit = 8 * 512 = 4,096 (2^12)
+* Pit speed timing:
+  * pit closed - 8 * 512 
+  * pit open/close = 512 each (4 * 128)
+  * pit fully open = 6 * 512
+  * TOTAL = 16 * 512 = 8,192 (2 ^ 13)
+
