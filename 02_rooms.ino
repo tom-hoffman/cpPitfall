@@ -81,12 +81,13 @@ void flashDangers() { // old code
 }
 
 void moveLogs() { // old code
-  for (uint8_t i = 9; i > 0; i--) {
+  for (byte i = 9; i > 0; i--) {
     // tbd
   }
 }
 
 void flickerTreasure() {
+  // couldn't get the quick flicker with the bit shift method
   if (millis() > nextFlicker) {
     bool fstate = getFlicker();
     if (fstate) {

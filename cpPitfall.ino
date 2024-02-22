@@ -52,7 +52,6 @@ const uint32_t DARK_RED      = gammaCorrect(0x6F001F); // RED - $06
 // non-original colors
 const uint32_t VIOLET        = gammaCorrect(0x7D058C);
 
-const uint32_t BG            = gammaCorrect(0x001800); // (deprecate)
 const uint32_t BG_COLOR      = gammaCorrect(0x001800);
 const uint32_t TREE_COLOR    = gammaCorrect(0x181800);        
 
@@ -106,9 +105,6 @@ const uint16_t PIT4_MASK   = 0b0011111110;
 const uint16_t PIT_MASKS[] = {PIT0_MASK, PIT1_MASK, PIT2_MASK, 
                               PIT3_MASK, PIT4_MASK};
 
-
-
-
 // ==================================
 // R O O M - C O D E S
 // ==================================
@@ -159,7 +155,7 @@ const uint8_t TREASURE_BIT = 7;  // 7      treasure
                                                // bit --  type
 const uint8_t FLASH_BIT           = 0;              // 0   danger flash/move
 const uint8_t FLASH_MASK          = bit(FLASH_BIT);
-const uint8_t FLICKER_BIT         = 1;              // 1   flicker treasure
+const uint8_t FLICKER_BIT         = 1;              // 1   flicker treasure 
 const uint8_t FLICKER_MASK        = bit(FLICKER_BIT);
 const uint8_t PIT_TRANSITION_BIT  = 2;              // 2   pit in transition
 const uint8_t PIT_TRANSITION_MASK = bit(PIT_TRANSITION_BIT);
@@ -194,6 +190,6 @@ uint16_t dirtyCells        = 0b1111111111;
 const uint8_t FLASH_PERIOD   = 255;
       uint32_t nextFlash     = FLASH_PERIOD;
 // flicker is for treasure
-const uint8_t SHORT_FLICKER  = 8;
-const uint8_t LONG_FLICKER   = 192;
+const uint8_t SHORT_FLICKER  = 2;
+const uint16_t LONG_FLICKER   = 256;
       uint32_t nextFlicker   = LONG_FLICKER;
