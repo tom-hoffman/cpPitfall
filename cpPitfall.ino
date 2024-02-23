@@ -66,6 +66,9 @@ const uint32_t GOLD_COLOR        = YELLOW;
 const uint32_t RING_COLOR        = DARK_RED;
 const uint32_t FLICKER_COLOR     = gammaCorrect(0xAAAAAA);
 const uint32_t TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
+// Pits
+const uint32_t TARPIT_COLOR      = BLACK;
+const uint32_t QUICKSAND_COLOR   = BLUE;
 
 const uint8_t CELL_COUNT       = 10; // In case you want a bigger led string.
 
@@ -98,12 +101,10 @@ const uint8_t        TREASURE_SPAWN = 1;
 // pit animation masks
 // layout: .T3210123. (remember it is reversed l/r)
 const uint16_t PIT0_MASK   = 0b0000000000;
-const uint16_t PIT1_MASK   = 0b0000010000;
-const uint16_t PIT2_MASK   = 0b0000111000;
-const uint16_t PIT3_MASK   = 0b0001111100;
-const uint16_t PIT4_MASK   = 0b0011111110;
-const uint16_t PIT_MASKS[] = {PIT0_MASK, PIT1_MASK, PIT2_MASK, 
-                              PIT3_MASK, PIT4_MASK};
+const uint16_t PIT1_MASK   = 0b0000100000;
+const uint16_t PIT2_MASK   = 0b0001110000;
+const uint16_t PIT3_MASK   = 0b0011111000;
+const uint16_t PIT4_MASK   = 0b0111111100;
 
 // ==================================
 // R O O M - C O D E S
@@ -145,7 +146,7 @@ const uint8_t VINE_BIT     = 1;  // 1      vine
 const uint8_t DANGER_BIT   = 2;  // 2      all non-croc dangers 
 const uint8_t TREE_BIT     = 3;  // 3      background tree trunk
 const uint8_t CROC_BIT     = 4;  // 4      crocodile
-const uint8_t HOLE_BIT     = 5;  // 5      pit (all)
+const uint8_t PIT_BIT      = 5;  // 5      pit (all)
 const uint8_t LADDER_BIT   = 6;  // 6      hole/ladder
 const uint8_t TREASURE_BIT = 7;  // 7      treasure
 
@@ -157,29 +158,27 @@ const uint8_t FLASH_BIT           = 0;              // 0   danger flash/move
 const uint8_t FLASH_MASK          = bit(FLASH_BIT);
 const uint8_t FLICKER_BIT         = 1;              // 1   flicker treasure 
 const uint8_t FLICKER_MASK        = bit(FLICKER_BIT);
-const uint8_t PIT_TRANSITION_BIT  = 2;              // 2   pit in transition
-const uint8_t PIT_TRANSITION_MASK = bit(PIT_TRANSITION_BIT);
-const uint8_t PIT_STATUS_MASK     = 0b00011111;     // a five bit value
+
 //==============================================================================
 // V A R I A B L E S
 //==============================================================================
 
-          uint8_t    lives           = 3;         // 2 bits
-          bool       above           = true;      // above/below ground
-volatile  bool       jumping         = false;     // interrupt from tap?
-          uint8_t    harryX          = 85;        // Harry's position from 0-100 
+uint8_t    lives           = 3;         // 2 bits
+bool       above           = true;      // above/below ground
+bool       jumping         = false;     // interrupt from tap?
+uint8_t    harryX          = 85;        // Harry's position from 0-100 
 
-          uint8_t    timers          = 0;         // packed booleans for timers
-          uint8_t    pitStatus       = 0;         // 5 bits of pit status
-          uint8_t    room            = RAND_SEED; // original's "random" 
-          uint8_t    cells[CELL_COUNT];           // contents of each cell
-          uint8_t    bits0to2        = room & 0b111;
-          uint8_t    bits3to5        = bits3to5   = (room >> 3) & 0b111;
+uint8_t    timers          = 0;         // packed booleans for timers
+uint8_t    pitStatus       = 0;         // 5 bits of pit status
+uint8_t    room            = RAND_SEED; // original's "random" 
+uint8_t    cells[CELL_COUNT];           // contents of each cell
+uint8_t    bits0to2        = room & 0b111;
+uint8_t    bits3to5        = bits3to5   = (room >> 3) & 0b111;
 
-          uint8_t    treasureArray[32];           // array of rooms with treasures   
-bool      roomContainsTreasure    = false;        // current room has treasure?
+uint8_t    treasureArray[32];           // array of rooms with treasures   
 
-uint16_t dirtyCells        = 0b1111111111;
+uint16_t   currentPitMask    = PIT0_MASK;
+uint16_t   dirtyCells        = 0b1111111111;
 
 
 //============

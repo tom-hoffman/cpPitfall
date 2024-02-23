@@ -21,8 +21,11 @@ void setup() {
 }
 
 void loop() {
-  if (roomContainsTreasure) {
+  if (roomIsTreasureRoom()) {
     flickerTreasure();
+  }
+  if (roomHasShiftingPit()) {
+    updateShiftingPit();
   }
   if (millis() > nextFlash) {
     flashDangers();

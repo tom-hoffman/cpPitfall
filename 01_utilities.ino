@@ -32,6 +32,11 @@ bool roomIsTreasureRoom() {
   return bits3to5 == SHIFTING_TART;
 }
 
+bool roomHasShiftingPit() {
+  // values 5-7 have shifting pits.
+  return bits3to5 > 4;
+}
+
 bool roomHasCrocs() {
   return bits3to5 == CROCS;
 }
@@ -98,6 +103,10 @@ int getTreasureColor() {
   else {
     return FLICKER_COLOR;
   }  
+}
+
+boolean cellContainsPit(uint8_t c) {
+  return (bitRead(cells[c], PIT_BIT));
 }
 
 boolean cellContainsDanger(uint8_t c) {

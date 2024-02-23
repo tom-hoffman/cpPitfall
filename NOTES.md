@@ -31,4 +31,7 @@ Write an algorithm that will return the current state of the pit based on any in
   * pit open/close = 512 each (4 * 128)
   * pit fully open = 6 * 512
   * TOTAL = 16 * 512 = 8,192 (2 ^ 13)
+(the above is a lttle misleading since it is by 512 milli chunks, not 128)
+The finest grained check is once every 128 millis.
+There are 64 steps.
 

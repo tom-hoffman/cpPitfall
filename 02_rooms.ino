@@ -15,7 +15,6 @@ uint8_t lfsrLeft(uint8_t r) {
 void resetRoom() {
   bits0to2 = room & 0b111;
   bits3to5   = (room >> 3) & 0b111;
-  roomContainsTreasure = checkRoomForTreasure();
   initCells();
   dirtyCells        = 0b1111111111;
 }
@@ -88,27 +87,33 @@ void moveLogs() { // old code
 
 void flickerTreasure() {
   // couldn't get the quick flicker with the bit shift method
-  if (millis() > nextFlicker) {
-    bool fstate = getFlicker();
-    if (fstate) {
-      nextFlicker = nextFlicker + SHORT_FLICKER;
+  if (checkRoomForTreasure()) {
+    if (millis() > nextFlicker) {
+      bool fstate = getFlicker();
+      if (fstate) {
+        nextFlicker = nextFlicker + SHORT_FLICKER;
+      }
+      else {
+        nextFlicker = nextFlicker + LONG_FLICKER;
+      }
+      timers = timers ^ FLICKER_MASK;
+      bitWrite(dirtyCells, TREASURE_SPAWN, 1);
     }
-    else {
-      nextFlicker = nextFlicker + LONG_FLICKER;
-    }
-    timers = timers ^ FLICKER_MASK;
-    bitWrite(dirtyCells, TREASURE_SPAWN, 1);
   }
 }
 
 void drawCell(uint8_t cell) {
   // Current state of the cell.
   // These need to be sequenced by precedence.
+  // There may be multiple contents but just one color is shown.
   if (cellContainsTreasure(cell)) {
     CircuitPlayground.setPixelColor(cell, getTreasureColor());
   }
   else if (cellContainsDanger(cell)) {
     CircuitPlayground.setPixelColor(cell, getDangerColor(cell));
+  }
+  else if (cellContainsPit(cell)) {
+    CircuitPlayground.setPixelColor(cell, TARPIT_COLOR);
   }
   else {
     CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
@@ -116,18 +121,44 @@ void drawCell(uint8_t cell) {
   bitWrite(dirtyCells, cell, 0);
 }
 
-void parseObjectMask(short mask, uint8_t offset) {
+void parseObjectMask(uint16_t mask, uint8_t offset) {
   // Reads the starting positions from a binary mask; 
   // writes the value to the cells array.
   for (uint8_t i = 0; i <= CELL_COUNT; i++) {
     if (bitRead(mask, i)) {
       writeCell(i, offset, 1);
     }
+    else {
+      writeCell(i, offset, 0);
+    }
   }
 }
 
 void parseBackground() {
   parseObjectMask(BACKGROUND_MASKS[room >> 6], TREE_BIT);
+}
+
+uint16_t getShiftingPitMask(uint8_t n) {
+  if (n < 32)         {return PIT0_MASK;}
+  else if (n < 33)    {return PIT1_MASK;}
+  else if (n < 34)    {return PIT2_MASK;}
+  else if (n < 36)    {return PIT3_MASK;}
+  else if (n < 60)    {return PIT4_MASK;}
+  else if (n < 62)    {return PIT3_MASK;}
+  else if (n < 63)    {return PIT2_MASK;}
+  else                {return PIT1_MASK;}
+}
+
+void updateShiftingPit() {
+  // The finest grained check is once every 128 millis.
+  // There are 64 steps.
+  byte n = ((millis() >> 6) & 0b00111111);
+  uint16_t newMask = getShiftingPitMask(n);
+  if (newMask != currentPitMask) {
+    parseObjectMask(newMask, PIT_BIT);
+    currentPitMask = newMask;
+    dirtyCells = 0b0011111110; // could be more optimized
+  }
 }
 
 void parseRoom() {
