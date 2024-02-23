@@ -15,7 +15,6 @@ void setup() {
     debugSetup();
   #endif
   initTreasureArray();
-  resetRoom();
   parseRoom();
   drawRoom();
 }

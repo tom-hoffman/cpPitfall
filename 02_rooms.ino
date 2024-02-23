@@ -12,13 +12,6 @@ uint8_t lfsrLeft(uint8_t r) {
   return r >> 1 | ((bitRead(r, 4) ^ bitRead(r, 5) ^ bitRead(r, 6) ^ bitRead(r, 0)) * 128);
 }
 
-void resetRoom() {
-  bits0to2 = room & 0b111;
-  bits3to5   = (room >> 3) & 0b111;
-  initCells();
-  dirtyCells        = 0b1111111111;
-}
-
 void nextRandom(boolean right, boolean above) {
   // Uses linear feedback shift register to generate next room 
   uint8_t x = 3;       // repeat 3 times if below ground
@@ -32,7 +25,6 @@ void nextRandom(boolean right, boolean above) {
     else {
       room = lfsrLeft(room);
     }
-  resetRoom();
   }
   #ifdef DEBUG
     Serial.print("Entering room ");
@@ -109,6 +101,9 @@ void drawCell(uint8_t cell) {
   if (cellContainsTreasure(cell)) {
     CircuitPlayground.setPixelColor(cell, getTreasureColor());
   }
+  else if (cellContainsCroc(cell)) {
+    CircuitPlayground.setPixelColor(cell, gammaCorrect(0x5D7E00));
+  }
   else if (cellContainsDanger(cell)) {
     CircuitPlayground.setPixelColor(cell, getDangerColor(cell));
   }
@@ -162,16 +157,27 @@ void updateShiftingPit() {
 }
 
 void parseRoom() {
-  // this is the main flow chart
+  // This is the main flow chart for parsing a new room.
+  // First reset stuff.
+  bits0to2 = room & 0b111;
+  bits3to5   = (room >> 3) & 0b111;
+  initCells();
+  dirtyCells        = 0b1111111111;
+  // Parse new room.
   parseBackground();
   // if bits 3-5 are 101 (5)
   // place treasure NOT holes/crocs/tar/quicksand/water
   if (roomIsTreasureRoom()) {
     writeCell(TREASURE_SPAWN, TREASURE_BIT, 1);
   }
-} 
   // if bits 3-5 are 100 (4)
   // place crocs, no objects 
+  else if (roomHasCrocs()) {
+    parseObjectMask(CROC_MASK, CROC_BIT);
+    parseObjectMask(PIT4_MASK, PIT_BIT);
+  }
+} 
+
   // AND if bits 0-2 are 010, 011, 110 or 111, add a vine
   // OTHERWISE
   // bits 3-5 determine pits

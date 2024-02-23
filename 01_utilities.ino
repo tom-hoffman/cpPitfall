@@ -126,6 +126,10 @@ bool cellContainsTreasure(uint8_t c) {
   return (bitRead(cells[c], TREASURE_BIT));
 }
 
+bool cellContainsCroc(uint8_t c) {
+  return (bitRead(cells[c], CROC_BIT));
+}
+
 uint8_t getFlash() {
   return bitRead(timers, FLASH_BIT);
 }

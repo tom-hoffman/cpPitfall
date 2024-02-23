@@ -51,26 +51,29 @@ const uint32_t DARK_GREEN    = gammaCorrect(0x103600); // GREEN - $04
 const uint32_t DARK_RED      = gammaCorrect(0x6F001F); // RED - $06
 // non-original colors
 const uint32_t VIOLET        = gammaCorrect(0x7D058C);
-
+const uint32_t AQUA          = gammaCorrect(0x339955);
 const uint32_t BG_COLOR      = gammaCorrect(0x001800);
 const uint32_t TREE_COLOR    = gammaCorrect(0x181800);        
 
 // Object color designations
-const uint32_t LOG_COLOR         = gammaCorrect(0x3B1F00);
-const uint32_t SNAKE_COLORS[]    = {GREY, VIOLET};
-const uint32_t FIRE_COLORS[]     = {DARK_RED, YELLOW};
+const uint32_t LOG_COLOR          = gammaCorrect(0x3B1F00);
+const uint32_t SNAKE_COLORS[]     = {GREY, VIOLET};
+const uint32_t FIRE_COLORS[]      = {DARK_RED, YELLOW};
 // Treasure main colors (with flickering bright white)
-const uint32_t MONEY_COLOR       = gammaCorrect(0x086B00);
-const uint32_t SILVER_COLOR      = GREY;
-const uint32_t GOLD_COLOR        = YELLOW;
-const uint32_t RING_COLOR        = DARK_RED;
-const uint32_t FLICKER_COLOR     = gammaCorrect(0xAAAAAA);
-const uint32_t TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
+const uint32_t MONEY_COLOR        = gammaCorrect(0x086B00);
+const uint32_t SILVER_COLOR       = GREY;
+const uint32_t GOLD_COLOR         = YELLOW;
+const uint32_t RING_COLOR         = DARK_RED;
+const uint32_t FLICKER_COLOR      = gammaCorrect(0xAAAAAA);
+const uint32_t TREASURE_COLORS[]  = {MONEY_COLOR, SILVER_COLOR, 
+                                     GOLD_COLOR, RING_COLOR};
 // Pits
-const uint32_t TARPIT_COLOR      = BLACK;
-const uint32_t QUICKSAND_COLOR   = gammaCorrect(0x000018);
+const uint32_t TARPIT_COLOR       = BLACK;
+const uint32_t QUICKSAND_COLOR    = gammaCorrect(0x000018);
+const uint32_t CROC_CLOSED_COLOR  = GREEN;
+const uint32_t CROC_OPEN_COLOR    = YELLOW-GREEN;
 
-const uint8_t CELL_COUNT       = 10; // In case you want a bigger led string.
+const uint8_t CELL_COUNT          = 10; // In case you want a bigger led string.
 
 // ==================================
 // O B J E C T - M A S K S
@@ -158,6 +161,8 @@ const uint8_t FLASH_BIT           = 0;              // 0   danger flash/move
 const uint8_t FLASH_MASK          = bit(FLASH_BIT);
 const uint8_t FLICKER_BIT         = 1;              // 1   flicker treasure 
 const uint8_t FLICKER_MASK        = bit(FLICKER_BIT);
+const uint8_t GATOR_BIT           = 2;
+const uint8_t GATOR_MASK          = bit(GATOR_BIT);
 
 //==============================================================================
 // V A R I A B L E S
