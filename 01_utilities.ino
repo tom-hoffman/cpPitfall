@@ -86,7 +86,7 @@ void writeCell(uint8_t cell, uint8_t bit, uint8_t value) {
   bitWrite(cells[cell], bit, value);
 }
 
-int getBackgroundColor(uint8_t c) {
+uint32_t getBackgroundColor(uint8_t c) {
   if (bitRead(cells[c], TREE_BIT)) {
     return (TREE_COLOR);
   }
@@ -95,7 +95,7 @@ int getBackgroundColor(uint8_t c) {
   }
 }
 
-int getTreasureColor() {
+uint32_t getTreasureColor() {
   // this returns the active flashing color
   if (bitRead(timers, FLICKER_BIT)) {
     return TREASURE_COLORS[bits0to2 & 0b011]; // treasure type bits 1 0
@@ -105,15 +105,24 @@ int getTreasureColor() {
   }  
 }
 
-boolean cellContainsPit(uint8_t c) {
+uint32_t getPitColor() {
+  switch (bits3to5) {
+    case 2: case 5: case 6: 
+      return TARPIT_COLOR; 
+    case 3: case 7:
+      return QUICKSAND_COLOR;
+  }
+}
+
+bool cellContainsPit(uint8_t c) {
   return (bitRead(cells[c], PIT_BIT));
 }
 
-boolean cellContainsDanger(uint8_t c) {
+bool cellContainsDanger(uint8_t c) {
   return (bitRead(cells[c], DANGER_BIT));
 }
 
-boolean cellContainsTreasure(uint8_t c) {
+bool cellContainsTreasure(uint8_t c) {
   return (bitRead(cells[c], TREASURE_BIT));
 }
 

@@ -113,10 +113,10 @@ void drawCell(uint8_t cell) {
     CircuitPlayground.setPixelColor(cell, getDangerColor(cell));
   }
   else if (cellContainsPit(cell)) {
-    CircuitPlayground.setPixelColor(cell, TARPIT_COLOR);
+    CircuitPlayground.setPixelColor(cell, getPitColor());
   }
-  else {
-    CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell));
+  else { // could be optimized
+    CircuitPlayground.setPixelColor(cell, getBackgroundColor(cell)); 
   }
   bitWrite(dirtyCells, cell, 0);
 }
@@ -157,7 +157,7 @@ void updateShiftingPit() {
   if (newMask != currentPitMask) {
     parseObjectMask(newMask, PIT_BIT);
     currentPitMask = newMask;
-    dirtyCells = 0b0011111110; // could be more optimized
+    dirtyCells = 0b0111111100; // could be more optimized
   }
 }
 

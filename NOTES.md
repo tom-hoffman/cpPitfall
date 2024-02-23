@@ -1,5 +1,13 @@
 # Notes and references for Circuit Pitfall
 
+## Steps to add an object
+* add to parseRoom
+* maybe need parsing code
+* might need update/parsing code
+* might need update/flashing code for loop()
+* add to drawCell
+* add getColor.
+
 ## First sequence of rooms:
 196 -> 137 -> 18 -> 37 -> 75
 

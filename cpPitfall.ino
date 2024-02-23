@@ -68,7 +68,7 @@ const uint32_t FLICKER_COLOR     = gammaCorrect(0xAAAAAA);
 const uint32_t TREASURE_COLORS[] = {MONEY_COLOR, SILVER_COLOR, GOLD_COLOR, RING_COLOR};
 // Pits
 const uint32_t TARPIT_COLOR      = BLACK;
-const uint32_t QUICKSAND_COLOR   = BLUE;
+const uint32_t QUICKSAND_COLOR   = gammaCorrect(0x000018);
 
 const uint8_t CELL_COUNT       = 10; // In case you want a bigger led string.
 
