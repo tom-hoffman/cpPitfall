@@ -48,7 +48,7 @@ void nextLeft() {
   drawRoom();
 }
 
-int getDangerColor(uint8_t cell) {
+uint32_t getDangerColor() {
   uint8_t sw = bitRead(timers, FLASH_BIT);
   switch (bits0to2) {
     case FIRE:
@@ -58,6 +58,11 @@ int getDangerColor(uint8_t cell) {
     default:
       return LOG_COLOR;
   }
+}
+
+uint32_t getCrocColor() {
+  return CROC_COLORS[bitRead(timers, CROC_FLASH_BIT) + 
+                     bitRead(timers, CROC_DANGER_BIT)];
 }
 
 void flashDangers() { // old code
@@ -102,10 +107,10 @@ void drawCell(uint8_t cell) {
     CircuitPlayground.setPixelColor(cell, getTreasureColor());
   }
   else if (cellContainsCroc(cell)) {
-    CircuitPlayground.setPixelColor(cell, gammaCorrect(0x5D7E00));
+    CircuitPlayground.setPixelColor(cell, getCrocColor());
   }
   else if (cellContainsDanger(cell)) {
-    CircuitPlayground.setPixelColor(cell, getDangerColor(cell));
+    CircuitPlayground.setPixelColor(cell, getDangerColor());
   }
   else if (cellContainsPit(cell)) {
     CircuitPlayground.setPixelColor(cell, getPitColor());
@@ -145,6 +150,8 @@ uint16_t getShiftingPitMask(uint8_t n) {
 }
 
 void updateShiftingPit() {
+  // This is not called by parseRoom() because it has to be
+  // frequently updated from the beginning.
   // The finest grained check is once every 128 millis.
   // There are 64 steps.
   byte n = ((millis() >> 6) & 0b00111111);
@@ -156,11 +163,28 @@ void updateShiftingPit() {
   }
 }
 
+void updateCrocs() {
+  uint32_t mil = millis();
+  byte n = ((mil >> 11) & 0b0001);
+  if (n != bitRead(timers, CROC_FLASH_BIT)) {
+    bitWrite(timers, CROC_FLASH_BIT, n);
+    bitWrite(timers, CROC_DANGER_BIT, 0);
+    dirtyCells = dirtyCells | CROC_MASK;
+  }
+  if (n) {
+    byte s = ((mil >> 5) & 0b0001);
+    if (s != bitRead(timers, CROC_DANGER_BIT)) {
+      bitWrite(timers, CROC_DANGER_BIT, s);
+      dirtyCells = dirtyCells | CROC_MASK;
+    }
+  }
+}
+
 void parseRoom() {
   // This is the main flow chart for parsing a new room.
   // First reset stuff.
   bits0to2 = room & 0b111;
-  bits3to5   = (room >> 3) & 0b111;
+  bits3to5 = (room >> 3) & 0b111;
   initCells();
   dirtyCells        = 0b1111111111;
   // Parse new room.

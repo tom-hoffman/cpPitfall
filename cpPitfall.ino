@@ -70,8 +70,10 @@ const uint32_t TREASURE_COLORS[]  = {MONEY_COLOR, SILVER_COLOR,
 // Pits
 const uint32_t TARPIT_COLOR       = BLACK;
 const uint32_t QUICKSAND_COLOR    = gammaCorrect(0x000018);
-const uint32_t CROC_CLOSED_COLOR  = GREEN;
-const uint32_t CROC_OPEN_COLOR    = YELLOW-GREEN;
+const uint32_t CROC_CLOSED_COLOR  = gammaCorrect(0x00AA00);
+const uint32_t CROC_OPEN_COLOR    = GREY;
+const uint32_t CROC_DANGER_COLOR  = DARK_RED;
+const uint32_t CROC_COLORS[]      = {CROC_CLOSED_COLOR, CROC_OPEN_COLOR, CROC_DANGER_COLOR};
 
 const uint8_t CELL_COUNT          = 10; // In case you want a bigger led string.
 
@@ -156,13 +158,15 @@ const uint8_t TREASURE_BIT = 7;  // 7      treasure
 //===================================
 // T I M E R - B I T S
 //===================================
-                                               // bit --  type
+                                                    // bit --  type
 const uint8_t FLASH_BIT           = 0;              // 0   danger flash/move
 const uint8_t FLASH_MASK          = bit(FLASH_BIT);
 const uint8_t FLICKER_BIT         = 1;              // 1   flicker treasure 
 const uint8_t FLICKER_MASK        = bit(FLICKER_BIT);
-const uint8_t GATOR_BIT           = 2;
-const uint8_t GATOR_MASK          = bit(GATOR_BIT);
+const uint8_t CROC_FLASH_BIT      = 2;
+const uint8_t CROC_FLASH_MASK     = bit(CROC_FLASH_BIT);
+const uint8_t CROC_DANGER_BIT     = 3;
+const uint8_t CROC_DANGER_MASK    = bit(CROC_DANGER_BIT);
 
 //==============================================================================
 // V A R I A B L E S
@@ -171,7 +175,7 @@ const uint8_t GATOR_MASK          = bit(GATOR_BIT);
 uint8_t    lives           = 3;         // 2 bits
 bool       above           = true;      // above/below ground
 bool       jumping         = false;     // interrupt from tap?
-uint8_t    harryX          = 85;        // Harry's position from 0-100 
+uint16_t    harryX          = 85;       // Harry's position from 0-1024 
 
 uint8_t    timers          = 0;         // packed booleans for timers
 uint8_t    pitStatus       = 0;         // 5 bits of pit status

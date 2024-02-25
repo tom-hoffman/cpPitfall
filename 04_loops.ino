@@ -20,8 +20,13 @@ void setup() {
 }
 
 void loop() {
+  // simple/crude benchmarking...
+  //long start = micros();
   if (roomIsTreasureRoom()) {
     flickerTreasure();
+  }
+  if (roomHasCrocs()) {
+    updateCrocs();
   }
   if (roomHasShiftingPit()) {
     updateShiftingPit();
@@ -30,4 +35,6 @@ void loop() {
     flashDangers();
   }
   drawRoom();
+  //long duration = micros() - start;
+  //Serial.println(duration);
 }
