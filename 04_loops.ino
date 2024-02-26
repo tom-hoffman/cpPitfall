@@ -20,8 +20,10 @@ void setup() {
 }
 
 void loop() {
+  #ifdef PROFILE
   // simple/crude benchmarking...
-  //long start = micros();
+  long start = micros();
+  #endif
   if (roomIsTreasureRoom()) {
     flickerTreasure();
   }
@@ -35,6 +37,8 @@ void loop() {
     flashDangers();
   }
   drawRoom();
-  //long duration = micros() - start;
-  //Serial.println(duration);
+  #ifdef PROFILE
+    long duration = micros() - start;
+    Serial.println(duration);
+  #endif
 }
