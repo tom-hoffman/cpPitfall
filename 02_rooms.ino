@@ -186,7 +186,7 @@ void parseRoom() {
   bits0to2 = room & 0b111;
   bits3to5 = (room >> 3) & 0b111;
   initCells();
-  dirtyCells        = 0b1111111111;
+  dirtyCells = 0b1111111111;
   // Parse new room.
   parseBackground();
   // if bits 3-5 are 101 (5)

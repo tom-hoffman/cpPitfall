@@ -112,6 +112,15 @@ const uint16_t PIT2_MASK   = 0b0001110000;
 const uint16_t PIT3_MASK   = 0b0011111000;
 const uint16_t PIT4_MASK   = 0b0111111100;
 
+// vine animation masks
+const uint16_t VINE0_MASK  = 0b0100000000;
+const uint16_t VINE1_MASK  = 0b0010000000;
+const uint16_t VINE2_MASK  = 0b0001000000;
+const uint16_t VINE3_MASK  = 0b0000100000;
+const uint16_t VINE4_MASK  = 0b0000010000;
+const uint16_t VINE5_MASK  = 0b0000001000;
+const uint16_t VINE6_MASK  = 0b0000000100;
+
 // ==================================
 // R O O M - C O D E S
 // ==================================

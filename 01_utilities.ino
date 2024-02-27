@@ -84,6 +84,7 @@ bool roomHasSnake() {
 void writeCell(uint8_t cell, uint8_t bit, uint8_t value) {
   // Convenience method to write a specific bit to a cell.
   bitWrite(cells[cell], bit, value);
+  bitWrite(dirtyCells, bit, 1);
 }
 
 uint32_t getBackgroundColor(uint8_t c) {
