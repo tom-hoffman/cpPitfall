@@ -112,15 +112,6 @@ const uint16_t PIT2_MASK   = 0b0001110000;
 const uint16_t PIT3_MASK   = 0b0011111000;
 const uint16_t PIT4_MASK   = 0b0111111100;
 
-// vine animation masks
-const uint16_t VINE0_MASK  = 0b0100000000;
-const uint16_t VINE1_MASK  = 0b0010000000;
-const uint16_t VINE2_MASK  = 0b0001000000;
-const uint16_t VINE3_MASK  = 0b0000100000;
-const uint16_t VINE4_MASK  = 0b0000010000;
-const uint16_t VINE5_MASK  = 0b0000001000;
-const uint16_t VINE6_MASK  = 0b0000000100;
-
 // ==================================
 // R O O M - C O D E S
 // ==================================
@@ -185,7 +176,7 @@ const uint8_t CROC_DANGER_MASK    = bit(CROC_DANGER_BIT);
 uint8_t    lives           = 3;         // 2 bits
 bool       above           = true;      // above/below ground
 bool       jumping         = false;     // interrupt from tap?
-uint16_t    harryX          = 85;       // Harry's position from 0-1024 
+uint8_t    harryX          = 85;       // Harry's position from 0-1024 
 
 uint8_t    timers          = 0;         // packed booleans for timers
 uint8_t    pitStatus       = 0;         // 5 bits of pit status
@@ -194,9 +185,11 @@ uint8_t    cells[CELL_COUNT];           // contents of each cell
 uint8_t    bits0to2        = room & 0b111;
 uint8_t    bits3to5        = bits3to5   = (room >> 3) & 0b111;
 
-uint8_t    treasureArray[32];           // array of rooms with treasures   
-
+uint8_t    treasureArray[32];           // array of rooms with treasures
+                                        // ideally get this to 4 bytes 
+                                        // as in the original.
 uint16_t   currentPitMask    = PIT0_MASK;
+uint16_t   currentVineMask   = VINE0_MASK;
 uint16_t   dirtyCells        = 0b1111111111;
 
 
@@ -209,5 +202,6 @@ const uint8_t FLASH_PERIOD   = 255;
       uint32_t nextFlash     = FLASH_PERIOD;
 // flicker is for treasure
 const uint8_t SHORT_FLICKER  = 2;
-const uint16_t LONG_FLICKER   = 256;
+const uint16_t LONG_FLICKER  = 256;
       uint32_t nextFlicker   = LONG_FLICKER;
+      uint32_t nextVine      = 0;

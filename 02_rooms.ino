@@ -139,7 +139,7 @@ void parseBackground() {
 }
 
 uint16_t getShiftingPitMask(uint8_t n) {
-  if (n < 32)         {return PIT0_MASK;}
+  if      (n < 32)    {return PIT0_MASK;}
   else if (n < 33)    {return PIT1_MASK;}
   else if (n < 34)    {return PIT2_MASK;}
   else if (n < 36)    {return PIT3_MASK;}
@@ -154,12 +154,12 @@ void updateShiftingPit() {
   // frequently updated from the beginning.
   // The finest grained check is once every 128 millis.
   // There are 64 steps.
-  byte n = ((millis() >> 6) & 0b00111111);
+  uint8_t n = (millis() >> 6) & 0b00111111;
   uint16_t newMask = getShiftingPitMask(n);
   if (newMask != currentPitMask) {
     parseObjectMask(newMask, PIT_BIT);
     currentPitMask = newMask;
-    dirtyCells = 0b0111111100; // could be more optimized
+    dirtyCells = 0b0111111100; // could be more optimized?
   }
 }
 
@@ -199,6 +199,8 @@ void parseRoom() {
   else if (roomHasCrocs()) {
     parseObjectMask(CROC_MASK, CROC_BIT);
     parseObjectMask(PIT4_MASK, PIT_BIT);
+    // if bit 1 == 1, there is a vine
+    // if (bitRead(1)) {}
   }
 } 
 
